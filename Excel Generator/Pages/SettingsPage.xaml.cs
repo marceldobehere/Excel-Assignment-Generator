@@ -31,6 +31,9 @@ namespace Excel_Generator
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (e.AddedItems.Count == 0)
+                return;
+            
             if (sender == langBox)
             {
                 Console.WriteLine($"Lang changed to: {e.AddedItems[0]}");
@@ -41,8 +44,8 @@ namespace Excel_Generator
     
         public void UpdateText()
         {
-            settingsTitleLabel.Text = Utils.LocalizationManager.GetPhrase(Phrase.Settings_TitleText);
-            settingsLangSelectionLabel.Text = Utils.LocalizationManager.GetPhrase(Phrase.Settings_LanguageSelectionText);
+            settingsTitleLabel.Text = LocalizationManager.GetPhrase(Phrase.Settings_TitleText);
+            settingsLangSelectionLabel.Text = LocalizationManager.GetPhrase(Phrase.Settings_LanguageSelectionText);
         }
     }
 }

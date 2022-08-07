@@ -26,6 +26,69 @@ namespace Excel_Generator.Utils
         }
         public static List<string> LanguageList = new List<string>();
 
+        public static string selectedYear = "";
+        public static string selectedClass = "";
+        public static string selectedAssignment = "";
+
+        public static List<string> YearList
+        {
+            get
+            {
+                Console.WriteLine("> Lade Jahres-Liste...");
+                List<string> yearList = new List<string>();
+                foreach (string yearFolder in Directory.GetDirectories(SETTINGS_PATH + "Jahre"))
+                    yearList.Add(Path.GetFileName(yearFolder));
+                yearList.Add(LocalizationManager.GetPhrase(LocalizationManager.LanguagePhraseList.Phrase.Main_SelectYearTextNew));
+
+                Console.WriteLine("> Fertig.");
+                return yearList;
+            }
+        }
+        
+        public static List<string> ClassList
+        {
+            get
+            {
+                Console.WriteLine("> Lade Klassen-Liste...");
+                List<string> classList = new List<string>();
+                if (selectedYear.Equals(""))
+                    goto end;
+                if (!Directory.Exists(SETTINGS_PATH + "Jahre/" + selectedYear + "/Klassen"))
+                    goto end;
+
+                foreach (string classFolder in Directory.GetDirectories(SETTINGS_PATH + "Jahre/" + selectedYear + "/Klassen"))
+                    classList.Add(Path.GetFileName(classFolder));
+                classList.Add(LocalizationManager.GetPhrase(LocalizationManager.LanguagePhraseList.Phrase.Main_SelectClassTextNew));
+
+            end:
+                Console.WriteLine("> Fertig.");
+                return classList;
+            }
+        }
+
+        public static List<string> AssignmentList
+        {
+            get
+            {
+                Console.WriteLine("> Lade Aufgaben-Liste...");
+                List<string> assignmentList = new List<string>();
+                if (selectedYear.Equals(""))
+                    goto end;
+                if (selectedClass.Equals(""))
+                    goto end;
+                if (!Directory.Exists(SETTINGS_PATH + "Jahre/" + selectedYear + "/Klassen/" + selectedClass + "/Aufgaben"))
+                    goto end;
+
+                foreach (string classFolder in Directory.GetDirectories(SETTINGS_PATH + "Jahre/" + selectedYear + "/Klassen/" + selectedClass + "/Aufgaben"))
+                    assignmentList.Add(Path.GetFileName(classFolder));
+                assignmentList.Add(LocalizationManager.GetPhrase(LocalizationManager.LanguagePhraseList.Phrase.Main_SelectAssignmentTextNew));
+
+            end:
+                Console.WriteLine("> Fertig.");
+                return assignmentList;
+            }
+        }
+
         public static void Init(string folderPath)
         {
             Console.Clear();
@@ -45,7 +108,9 @@ namespace Excel_Generator.Utils
                 Console.WriteLine($" - Sprache: \"{langName}\"");
                 LanguageList.Add(langName);
             }
-            
+            selectedClass = "";
+            selectedYear = "";
+
             Console.WriteLine("> Fertig!");
 
         }

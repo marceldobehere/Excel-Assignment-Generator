@@ -38,6 +38,8 @@ namespace Excel_Generator.Utils
         {
             Console.WriteLine("> Lade Sprachdaten...");
 
+            LanguagePhraseList.DisplayAllLanguageTextAsEnum("LANG_DE");
+
             if (!Utils.ResourceExists("LANG_" + Settings.Language))
                 Settings.Language = "DE";
 
@@ -49,17 +51,31 @@ namespace Excel_Generator.Utils
 
         public class LanguagePhraseList
         {
-            /*
-            Main_TestText: "Das ist ein Test!"
-            Main_SettingsButton: "Einstellungen"
-            Settings_TitleText: "Einstellungen"
-            Settings_LanguageSelectionText: "Sprache"
-            */
             public enum Phrase
             {
                 Main_TestText,
                 Main_SettingsButton,
                 Main_TitleText,
+                Main_SelectYearText,
+                Main_SelectYearTextNew,
+                Main_SelectYearTextNewText,
+                Main_SelectYearTextDeleteText,
+                Main_SelectClassText,
+                Main_SelectClassTextNew,
+                Main_SelectClassTextNewText,
+                Main_SelectClassTextDeleteText,
+                Main_SelectAssignmentText,
+                Main_SelectAssignmentTextNew,
+                Main_SelectAssignmentTextNewText,
+                Main_SelectAssignmentTextDeleteText,
+                Input_TitleText,
+                Input_ConfirmButton,
+                Input_CancelButton,
+                Input_YesButton,
+                Input_NoButton,
+                Input_InvalidInputTitleText,
+                Input_InvalidInputText,
+                Input_WarningTitleText,
                 Settings_TitleText,
                 Settings_LanguageSelectionText
             };
@@ -80,6 +96,30 @@ namespace Excel_Generator.Utils
             public void SetPhrase(Phrase setting, SettingsObject settingsObject)
             {
                 phrases[setting] = settingsObject;
+            }
+
+            public static void DisplayAllLanguageTextAsEnum(string filePath)
+            {
+                using (StreamReader reader = Utils.GetResourceFileStreamReader(filePath))
+                {
+                    bool first = false;
+                    Console.WriteLine("----------------------");
+                    Console.WriteLine("public enum Phrase \n{");
+                    while (!reader.EndOfStream)
+                    {
+                        string line = reader.ReadLine().Trim();
+                        int splitIndex = line.IndexOf(':');
+                        if (splitIndex == -1 || splitIndex == line.Length - 1)
+                            continue;
+                        if (!first)
+                            first = true;
+                        else
+                            Console.Write(",\n");
+                        Console.Write($"\t{line.Substring(0, splitIndex).Trim()}");
+                    }
+                    Console.WriteLine("\n}");
+                    Console.WriteLine("----------------------\n");
+                }
             }
 
             public void LoadLanguageData(string filePath)

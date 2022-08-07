@@ -53,7 +53,7 @@ namespace Excel_Generator
 
         public void UpdateText()
         {
-            settingsButton.Content = Utils.LocalizationManager.GetPhrase(Phrase.Main_SettingsButton);
+            settingsButton.Content = LocalizationManager.GetPhrase(Phrase.Main_SettingsButton);
         }
 
         private void settingsButton_Click(object sender, RoutedEventArgs e)

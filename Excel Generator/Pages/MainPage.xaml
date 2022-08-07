@@ -7,8 +7,19 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Background="White">
     <Grid>
-        <TextBlock x:Name="testTextLabel" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Height="112" Width="308" Margin="10,92,0,0"><Run Language="de-de" Text="Das ist ein sehr krasser test!"/><LineBreak/><Run Language="de-de"/></TextBlock>
+        <TextBlock x:Name="selectClassLabel" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Height="54" Width="272" Margin="10,141,0,0" FontSize="20"><Run Language="de-de" Text="Wählen Sie eine Klasse aus"/></TextBlock>
         <TextBlock x:Name="titleLabel" HorizontalAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="61" Width="444" TextAlignment="Center" FontSize="20" FontWeight="Bold"><Run Language="de-de" Text="Excel Angaben Generator und Bewerter"/></TextBlock>
+        <TextBlock x:Name="selectYearLabel" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Height="54" Width="272" Margin="10,87,0,0" FontSize="20"><Run Text="Wählen Sie ein"/><Run Language="de-de" Text=" Jahr aus"/></TextBlock>
+        <ComboBox x:Name="selectYearBox" HorizontalAlignment="Left" Margin="287,87,0,0" VerticalAlignment="Top" Width="176" Height="40" FontSize="20" SelectionChanged="selectYearBox_SelectionChanged"/>
+        <ComboBox x:Name="selectClassBox" HorizontalAlignment="Left" Margin="287,141,0,0" VerticalAlignment="Top" Width="176" Height="40" FontSize="20" SelectionChanged="selectClassBox_SelectionChanged"/>
+        <Button x:Name="deleteYearButton" Content="X" HorizontalAlignment="Left" Margin="503,87,0,0" VerticalAlignment="Top" Click="deleteYearButton_Click" RenderTransformOrigin="-0.333,1.603" Height="40" Width="40" Foreground="#FF952626" FontSize="30" FontWeight="Bold"/>
+        <Button x:Name="deleteClassButton" Content="X" HorizontalAlignment="Left" Margin="503,141,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.939,-0.18" Height="40" Width="40" Foreground="#FF952626" FontSize="30" FontWeight="Bold" Click="deleteClassButton_Click"/>
+        <TextBlock x:Name="selectAssignmentLabel" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Height="54" Width="272" Margin="10,195,0,0" FontSize="20"><Run Text="Wählen Sie eine "/><Run Language="de-de" Text="Aufgabe"/><Run Text=" aus"/></TextBlock>
+        <ComboBox x:Name="selectAssignmentBox" HorizontalAlignment="Left" Margin="287,197,0,0" VerticalAlignment="Top" Width="335" Height="40" FontSize="20" SelectionChanged="selectAssignmentBox_SelectionChanged"/>
+        <Button x:Name="deleteAssignmentButton" Content="X" HorizontalAlignment="Left" Margin="672,197,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.939,-0.18" Height="40" Width="40" Foreground="#FF952626" FontSize="30" FontWeight="Bold" Click="deleteAssignmentButton_Click"/>
+        <Button x:Name="openInFolderButton" HorizontalAlignment="Left" Margin="627,197,0,0" VerticalAlignment="Top" Height="40" Width="40" RenderTransformOrigin="0.84,0.22" Click="openInFolderButton_Click">
+            <Image Height="36" Width="36" Source="/Pages/openInFolder.png"/>
+        </Button>
 
     </Grid>
 </UserControl>

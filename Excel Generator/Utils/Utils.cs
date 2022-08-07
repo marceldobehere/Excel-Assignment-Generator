@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -34,7 +35,24 @@ namespace Excel_Generator.Utils
             ShowWindow(GetConsoleWindow(), SW_SHOW);
         }
 
-        private static string[] resourceNames;
+        public static void WindowsExplorerOpen(string path)
+        {
+            CommandLine(path, $"start \"\" \"{path}\"");
+        }
+
+        private static void CommandLine(string workingDirectory, string Command)
+        {
+            ProcessStartInfo processInfo;
+            
+            processInfo = new ProcessStartInfo("cmd.exe", "/K \"" + Command + "\" && exit");
+            processInfo.WorkingDirectory = workingDirectory;
+            processInfo.CreateNoWindow = true;
+            processInfo.UseShellExecute = true;
+            processInfo.WindowStyle = ProcessWindowStyle.Hidden;
+
+            Process process = Process.Start(processInfo);
+            process.WaitForExit();
+        }
 
         public static List<string> GetAllResourcesThatStartWith(string start)
         {
@@ -65,8 +83,21 @@ namespace Excel_Generator.Utils
         {
             //var assembly = Assembly.GetExecutingAssembly();
             //var stream = assembly.GetManifestResourceStream($"Excel_Generator.{filename}");
-            byte[] byteArr = Excel_Generator.Properties.Resources.ResourceManager.GetObject(filename) as byte[];
+            byte[] byteArr = Properties.Resources.ResourceManager.GetObject(filename) as byte[];
             return new StreamReader(new MemoryStream(byteArr));
+        }
+
+        private static string allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_ ";
+        public static bool CheckFolderName(string name)
+        {
+            if (name.Length == 0)
+                return false;
+            
+            foreach (char c in name)
+                if (!allowedChars.Contains(c))
+                    return false;
+
+            return true;
         }
 
         public static string EscapeString(string original)
