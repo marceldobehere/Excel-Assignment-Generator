@@ -1,9 +1,9 @@
-﻿<UserControl x:Class="Excel_Generator.MainPage"
+﻿<UserControl x:Class="Excel_Generator.Pages.MainPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Excel_Generator"
+             xmlns:local="clr-namespace:Excel_Generator.Pages"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Background="White">
     <Grid>
@@ -20,6 +20,7 @@
         <Button x:Name="openInFolderButton" HorizontalAlignment="Left" Margin="627,197,0,0" VerticalAlignment="Top" Height="40" Width="40" RenderTransformOrigin="0.84,0.22" Click="openInFolderButton_Click">
             <Image Height="36" Width="36" Source="/Pages/openInFolder.png"/>
         </Button>
+        <Button x:Name="classMenuButton" Content="Klassen Menü" HorizontalAlignment="Left" Margin="548,141,0,0" VerticalAlignment="Top" Height="40" Width="164" FontSize="20" Click="classMenuButton_Click"/>
 
     </Grid>
 </UserControl>

@@ -29,6 +29,7 @@ namespace Excel_Generator.Utils
         public static string selectedYear = "";
         public static string selectedClass = "";
         public static string selectedAssignment = "";
+        public static string selectedStudent = "";
 
         public static List<string> YearList
         {
@@ -44,7 +45,8 @@ namespace Excel_Generator.Utils
                 return yearList;
             }
         }
-        
+
+
         public static List<string> ClassList
         {
             get
@@ -63,6 +65,37 @@ namespace Excel_Generator.Utils
             end:
                 Console.WriteLine("> Fertig.");
                 return classList;
+            }
+        }
+
+        public static List<string> StudentList
+        {
+            get
+            {
+                Console.WriteLine("> Lade Schüler-Liste...");
+                List<string> studentList = new List<string>();
+                if (selectedYear.Equals(""))
+                    goto end;
+                if (selectedClass.Equals(""))
+                    goto end;
+
+                string filePath = SETTINGS_PATH + "Jahre/" + selectedYear + "/Klassen/" + selectedClass + "/Klassenliste.txt";
+
+                if (!File.Exists(filePath))
+                    goto end;
+
+                using (StreamReader reader = new StreamReader(filePath))
+                {
+                    while (!reader.EndOfStream)
+                    {
+                        studentList.Add(reader.ReadLine());
+                    }
+                }
+                studentList.Add(LocalizationManager.GetPhrase(LocalizationManager.LanguagePhraseList.Phrase.Class_SelectStudentTextNew));
+
+            end:
+                Console.WriteLine("> Fertig.");
+                return studentList;
             }
         }
 

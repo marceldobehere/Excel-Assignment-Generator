@@ -40,6 +40,7 @@ namespace Excel_Generator.Windows
             questionText.Text = question;
             confirmButton.Content = confirmText;
             cancelButton.Content = cancelText;
+            inputText.Focus();
         }
 
         public string InputText
@@ -74,6 +75,12 @@ namespace Excel_Generator.Windows
             {
                 state = InputState.CONFIRMED;
                 Close();
+                return;
+            }
+            if (e.Key == Key.Escape)
+            {
+                Close();
+                return;
             }
         }
     }

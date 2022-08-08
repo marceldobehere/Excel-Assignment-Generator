@@ -87,6 +87,11 @@ namespace Excel_Generator.Utils
             return new StreamReader(new MemoryStream(byteArr));
         }
 
+        public static byte[] GetResourceFileByteArray(string filename)
+        {
+            return Properties.Resources.ResourceManager.GetObject(filename) as byte[];
+        }
+
         private static string allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_ ";
         public static bool CheckFolderName(string name)
         {

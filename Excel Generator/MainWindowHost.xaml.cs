@@ -21,7 +21,7 @@ namespace Excel_Generator
     /// </summary>
     public partial class MainWindowHost : Window
     {
-        private static MainWindowHost globalHost;
+        public static MainWindowHost globalHost;
         private bool doneInit;
 
         public MainWindowHost()
@@ -48,6 +48,7 @@ namespace Excel_Generator
 
             globalHost.UpdateText();
             globalHost.settingsPage.UpdateText();
+            globalHost.classMenuPage.UpdateText();
             globalHost.mainPage.UpdateText();
         }
 

@@ -10,10 +10,16 @@
 
   <ItemGroup>
     <None Remove="Pages\openInFolder.png" />
+    <None Remove="Pages\uploadFromFile.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NPOI" Version="2.5.6" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="Pages\openInFolder.png" />
+    <Resource Include="Pages\uploadFromFile.png" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,12 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:uc="clr-namespace:Excel_Generator"
+        xmlns:uc="clr-namespace:Excel_Generator.Pages"
         xmlns:local="clr-namespace:Excel_Generator"
         mc:Ignorable="d"
         Title="Excel Generator" Height="500" Width="800" HorizontalAlignment="Center" VerticalAlignment="Center" SizeToContent="Manual">
     <Grid>
         <uc:MainPage x:Name="mainPage" Visibility="Visible"/>
+        <uc:ClassMenuPage x:Name="classMenuPage" Visibility="Hidden"/>
         <uc:SettingsPage x:Name="settingsPage" Visibility="Hidden"/>
         <Button x:Name="settingsButton" Content="Settings" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Height="34" Width="85" Click="settingsButton_Click"/>
     </Grid>

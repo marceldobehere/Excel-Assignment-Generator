@@ -15,7 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using static Excel_Generator.Utils.LocalizationManager.LanguagePhraseList;
 
-namespace Excel_Generator
+namespace Excel_Generator.Pages
 {
     /// <summary>
     /// Interaktionslogik für Test2.xaml

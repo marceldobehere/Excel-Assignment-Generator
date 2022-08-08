@@ -55,6 +55,7 @@ namespace Excel_Generator.Utils
             {
                 Main_TestText,
                 Main_SettingsButton,
+                Main_ClassMenuButton,
                 Main_TitleText,
                 Main_SelectYearText,
                 Main_SelectYearTextNew,
@@ -77,7 +78,15 @@ namespace Excel_Generator.Utils
                 Input_InvalidInputText,
                 Input_WarningTitleText,
                 Settings_TitleText,
-                Settings_LanguageSelectionText
+                Settings_LanguageSelectionText,
+                Class_TitleText,
+                Class_StudentText,
+                Class_StudentNameText,
+                Class_StudentNumberText,
+                Class_SelectStudentText,
+                Class_SelectStudentTextNew,
+                Class_SelectStudentTextNewText,
+                Class_SelectStudentTextDeleteText
             };
 
             private Dictionary<Phrase, SettingsObject> phrases;

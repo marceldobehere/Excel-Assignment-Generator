@@ -63,6 +63,16 @@ namespace Excel_Generator.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Byte[].
         /// </summary>
+        public static byte[] EXAMPLE_Vorlage {
+            get {
+                object obj = ResourceManager.GetObject("EXAMPLE_Vorlage", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Byte[].
+        /// </summary>
         public static byte[] LANG_DE {
             get {
                 object obj = ResourceManager.GetObject("LANG_DE", resourceCulture);

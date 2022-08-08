@@ -19,7 +19,7 @@ using System.Windows.Shapes;
 using static Excel_Generator.Utils.LocalizationManager.LanguagePhraseList;
 using static Excel_Generator.Windows.Input;
 
-namespace Excel_Generator
+namespace Excel_Generator.Pages
 {
     /// <summary>
     /// Interaktionslogik für Test1.xaml
@@ -34,6 +34,7 @@ namespace Excel_Generator
         public void UpdateText()
         {
             titleLabel.Text = LocalizationManager.GetPhrase(Phrase.Main_TitleText);
+            classMenuButton.Content = LocalizationManager.GetPhrase(Phrase.Main_ClassMenuButton);
 
             selectYearLabel.Text = LocalizationManager.GetPhrase(Phrase.Main_SelectYearText);
             selectYearBox.ItemsSource = Settings.YearList;
@@ -42,18 +43,19 @@ namespace Excel_Generator
             selectClassLabel.Text = LocalizationManager.GetPhrase(Phrase.Main_SelectClassText);
             selectClassBox.ItemsSource = Settings.ClassList;
             deleteClassButton.IsEnabled = !Settings.selectedClass.Equals("");
+            classMenuButton.IsEnabled = deleteClassButton.IsEnabled;
 
             selectAssignmentLabel.Text = LocalizationManager.GetPhrase(Phrase.Main_SelectAssignmentText);
             selectAssignmentBox.ItemsSource = Settings.AssignmentList;
             deleteAssignmentButton.IsEnabled = !Settings.selectedAssignment.Equals("");
-            openInFolderButton.IsEnabled = !Settings.selectedAssignment.Equals("");
+            openInFolderButton.IsEnabled = deleteAssignmentButton.IsEnabled;
         }
 
         private void selectYearBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count == 0)
                 return;
-            
+
             string selected = e.AddedItems[0] as string;
             if (selected.Equals(LocalizationManager.GetPhrase(Phrase.Main_SelectYearTextNew)))
             {
@@ -68,7 +70,7 @@ namespace Excel_Generator
                         selectYearBox.ItemsSource = Settings.YearList;
                         Utils.Settings.selectedYear = info.inputText;
                         selectYearBox.SelectedValue = info.inputText;
-                        
+
                     }
                     else
                     {
@@ -87,14 +89,20 @@ namespace Excel_Generator
             {
                 Utils.Settings.selectedYear = selected;
             }
+            selectClassBox.SelectedValue = "";
+            Utils.Settings.selectedClass = "";
+            Settings.selectedStudent = "";
+            selectAssignmentBox.SelectedValue = "";
+            Utils.Settings.selectedAssignment = "";
             UpdateText();
+            MainWindowHost.globalHost.classMenuPage.UpdateText();
         }
 
         private void selectClassBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count == 0)
                 return;
-            
+
             string selected = e.AddedItems[0] as string;
             if (selected.Equals(LocalizationManager.GetPhrase(Phrase.Main_SelectClassTextNew)))
             {
@@ -106,6 +114,7 @@ namespace Excel_Generator
                     if (Utils.Utils.CheckFolderName(info.inputText))
                     {
                         Directory.CreateDirectory(Utils.Settings.SETTINGS_PATH + "Jahre/" + Utils.Settings.selectedYear + "/Klassen/" + info.inputText + "/Aufgaben");
+                        File.Create(Utils.Settings.SETTINGS_PATH + "Jahre/" + Utils.Settings.selectedYear + "/Klassen/" + info.inputText + "/Klassenliste.txt");
                         selectClassBox.ItemsSource = Settings.ClassList;
                         Utils.Settings.selectedClass = info.inputText;
                         selectClassBox.SelectedValue = info.inputText;
@@ -127,7 +136,11 @@ namespace Excel_Generator
             {
                 Utils.Settings.selectedClass = selected;
             }
+            selectAssignmentBox.SelectedValue = "";
+            Utils.Settings.selectedAssignment = "";
+            Settings.selectedStudent = "";
             UpdateText();
+            MainWindowHost.globalHost.classMenuPage.UpdateText();
         }
 
         private void selectAssignmentBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -153,6 +166,15 @@ namespace Excel_Generator
                         selectAssignmentBox.ItemsSource = Settings.AssignmentList;
                         Utils.Settings.selectedAssignment = info.inputText;
                         selectAssignmentBox.SelectedValue = info.inputText;
+
+
+
+                        // Vorlage
+                        byte[] data = Utils.Utils.GetResourceFileByteArray("EXAMPLE_Vorlage");
+                        using (BinaryWriter writer = new BinaryWriter(new FileStream(pathToAssignment + "/Vorlage.xlsx", FileMode.Create)))
+                        {
+                            writer.Write(data);
+                        }
                     }
                     else
                     {
@@ -172,6 +194,7 @@ namespace Excel_Generator
                 Utils.Settings.selectedAssignment = selected;
             }
             UpdateText();
+            MainWindowHost.globalHost.classMenuPage.UpdateText();
         }
 
         private void deleteYearButton_Click(object sender, RoutedEventArgs e)
@@ -184,6 +207,7 @@ namespace Excel_Generator
                 Settings.selectedYear = "";
                 selectYearBox.SelectedValue = "";
                 UpdateText();
+                MainWindowHost.globalHost.classMenuPage.UpdateText();
             }
         }
 
@@ -197,12 +221,13 @@ namespace Excel_Generator
                 Settings.selectedClass = "";
                 selectClassBox.SelectedValue = "";
                 UpdateText();
+                MainWindowHost.globalHost.classMenuPage.UpdateText();
             }
         }
 
         private void deleteAssignmentButton_Click(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine($"> Delete Assignment {Settings.selectedClass}?");
+            Console.WriteLine($"> Delete Assignment {Settings.selectedAssignment}?");
             MessageBoxResult res = MessageBox.Show(LocalizationManager.GetPhrase(Phrase.Main_SelectAssignmentTextDeleteText), LocalizationManager.GetPhrase(Phrase.Input_WarningTitleText), MessageBoxButton.YesNo);
             if (res == MessageBoxResult.Yes)
             {
@@ -210,12 +235,18 @@ namespace Excel_Generator
                 Settings.selectedAssignment = "";
                 selectAssignmentBox.SelectedValue = "";
                 UpdateText();
+                MainWindowHost.globalHost.classMenuPage.UpdateText();
             }
         }
 
         private void openInFolderButton_Click(object sender, RoutedEventArgs e)
         {
-           Utils.Utils.WindowsExplorerOpen(Utils.Settings.SETTINGS_PATH + "Jahre/" + Settings.selectedYear + "/Klassen/" + Settings.selectedClass + "/Aufgaben/" + Settings.selectedAssignment );
+            Utils.Utils.WindowsExplorerOpen(Utils.Settings.SETTINGS_PATH + "Jahre/" + Settings.selectedYear + "/Klassen/" + Settings.selectedClass + "/Aufgaben/" + Settings.selectedAssignment);
+        }
+
+        private void classMenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindowHost.globalHost.classMenuPage.Visibility = Visibility.Visible;
         }
     }
 }
