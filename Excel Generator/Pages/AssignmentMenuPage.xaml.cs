@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -18,6 +19,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using static Excel_Generator.Utils.LocalizationManager.LanguagePhraseList;
+using static Excel_Generator.Utils.Utils;
 
 namespace Excel_Generator.Pages
 {
@@ -123,9 +125,9 @@ namespace Excel_Generator.Pages
             {
                 if (studentName.Equals(LocalizationManager.GetPhrase(Phrase.Class_SelectStudentTextNew)))
                     continue;
-                Utils.Utils.StudentObject studentObj = Utils.Utils.ConvertStringToStudentStruct(studentName);
+                StudentObject studentObj = Utils.Utils.ConvertStringToStudentStruct(studentName);
                 if (studentObj != null)
-                StudentCheckBoxList.Add(new CheckBoxUnit(studentObj.name, studentObj.id));
+                    StudentCheckBoxList.Add(new CheckBoxUnit(studentObj.name, studentObj.id));
             }
 
             studentList.ItemsSource = StudentCheckBoxList;
@@ -174,7 +176,7 @@ namespace Excel_Generator.Pages
             }
         }
 
-        private List<CheckBoxUnit> getSelectedBoxed()
+        private List<CheckBoxUnit> GetSelectedBoxes()
         {
             List<CheckBoxUnit> units = new List<CheckBoxUnit>();
             foreach (var item in studentList.ItemsSource)
@@ -184,6 +186,39 @@ namespace Excel_Generator.Pages
                     units.Add(student);
             }
             return units;
+        }
+
+        private List<StudentObject> GetSelectedStudents()
+        {
+            List<StudentObject> studentList = new List<StudentObject>();
+            foreach (var studentName in Settings.StudentList)
+            {
+                if (studentName.Equals(LocalizationManager.GetPhrase(Phrase.Class_SelectStudentTextNew)))
+                    continue;
+                StudentObject studentObj = ConvertStringToStudentStruct(studentName);
+                if (studentObj != null)
+                    studentList.Add(studentObj);
+            }
+
+            List<CheckBoxUnit> units = GetSelectedBoxes();
+            List<StudentObject> students = new List<StudentObject>();
+
+            foreach (CheckBoxUnit unit in units)
+            {
+                StudentObject foundStudent = null;
+
+                foreach (StudentObject tempStudent in studentList)
+                    if (tempStudent.id == unit.Id)
+                    {
+                        foundStudent = tempStudent;
+                        break;
+                    }
+
+                if (foundStudent != null)
+                    students.Add(foundStudent);
+            }
+
+            return students;
         }
 
         private void studentList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -199,8 +234,12 @@ namespace Excel_Generator.Pages
 
         // TODO:
         // Change colour of students depending on if they have an assignment and if its submitted
-        // Add Button to upload assignments
         // Add Bindings to Excel Test App
+        // - Make it not delete everything when generating
+        // - Delete Assignments
+        // - Grade Assignments
+        // - View Assignments
+
         // Add Manual Grading
         // Improve Vorlage
         // Add Student Statistics
@@ -209,6 +248,20 @@ namespace Excel_Generator.Pages
 
         private void addAssignmentButton_Click(object sender, RoutedEventArgs e)
         {
+            // TODO: Check for overlapping students
+
+            string assignmentFolderPath = Settings.SETTINGS_PATH      + "Jahre/"      +
+                                          Settings.selectedYear       + "/Klassen/"   +
+                                          Settings.selectedClass      + "/Aufgaben/"  +
+                                          Settings.selectedAssignment + "/";
+
+            string solFile = assignmentFolderPath + "Vorlage.xlsx";
+            string solFolder = assignmentFolderPath + "Loesungen";
+            string queFolder = assignmentFolderPath + "Aufgaben";
+
+            Excel_API.MainExcelAPI.ErrorRes error = Excel_API.MainExcelAPI.GenerateAssignmentsForStudents(GetSelectedStudents().ToArray(), solFile, solFolder, queFolder);
+            if (error != null)
+                MessageBox.Show($"Error: {error.exception}");
 
         }
 
@@ -231,21 +284,26 @@ namespace Excel_Generator.Pages
         {
             OpenFileDialog test = new OpenFileDialog();
             test.Multiselect = true;
-            //test.Filter = "Excel Files|*.xls;*.xlsx;*.xlsm";
+            test.Filter = "Excel Files|*.xls;*.xlsx;*.xlsm";
 
-            Console.WriteLine("Test");
             var res = test.ShowDialog();
-            Console.WriteLine($"T1: {res.HasValue}");
             if (!res.HasValue)
                 return;
-            Console.WriteLine($"T2: {res.Value}");
             if (!res.Value)
                 return;
 
-
             Console.WriteLine("Files:");
-            foreach(string filename in test.FileNames)
+            foreach (string filename in test.FileNames)
+            {
                 Console.WriteLine($" - {filename}");
+                string newFilename = Settings.SETTINGS_PATH      + "Jahre/"                +
+                                     Settings.selectedYear       + "/Klassen/"             +
+                                     Settings.selectedClass      + "/Aufgaben/"            +
+                                     Settings.selectedAssignment + "/Abgegebene Aufgaben/" + 
+                                     System.IO.Path.GetFileName(filename);
+                File.Copy(filename, newFilename, true);
+            }
+
 
         }
     }

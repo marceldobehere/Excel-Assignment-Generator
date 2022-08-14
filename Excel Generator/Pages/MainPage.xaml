@@ -22,6 +22,7 @@
         </Button>
         <Button x:Name="classMenuButton" Content="Klassen Menü" HorizontalAlignment="Left" Margin="548,141,0,0" VerticalAlignment="Top" Height="40" Width="164" FontSize="20" Click="classMenuButton_Click"/>
         <Button x:Name="assignmentMenuButton" Content="Aufgaben Menü" HorizontalAlignment="Left" Margin="287,249,0,0" VerticalAlignment="Top" Height="40" Width="217" FontSize="20" Click="assignmentMenuButton_Click"/>
+        <Button Content="Test" HorizontalAlignment="Left" Margin="106,388,0,0" VerticalAlignment="Top" Click="Button_Click"/>
 
     </Grid>
 </UserControl>

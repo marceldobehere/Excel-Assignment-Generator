@@ -262,5 +262,10 @@ namespace Excel_Generator.Pages
         {
             MainWindowHost.globalHost.assignmentMenuPage.Visibility = Visibility.Visible;
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Excel_API.MainExcelAPI.FakeMain(new string[0]);
+        }
     }
 }
