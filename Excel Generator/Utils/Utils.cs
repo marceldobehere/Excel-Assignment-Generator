@@ -92,6 +92,38 @@ namespace Excel_Generator.Utils
             return Properties.Resources.ResourceManager.GetObject(filename) as byte[];
         }
 
+        public class StudentObject
+        {
+            public string name = "";
+            public int id = -1;
+            public StudentObject(string name, int id)
+            {
+                this.name = name;
+                this.id = id;
+            }
+        }
+
+        public static StudentObject ConvertStringToStudentStruct(string name)
+        {
+            string[] split = name.Split(",");
+            int id = -1;
+            if (int.TryParse(split[0], out id))
+            {
+                StudentObject student = new StudentObject(split[1], id);
+                return student;
+            }
+            else if (int.TryParse(split[1], out id))
+            {
+                StudentObject student = new StudentObject(split[0], id);
+                return student;
+            }
+            else
+            {
+                Console.WriteLine($"ERROR: Student \"{name}\" cannot be parsed!");
+                return null;
+            }
+        }
+
         private static string allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_ ";
         public static bool CheckFolderName(string name)
         {

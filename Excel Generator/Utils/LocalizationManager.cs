@@ -56,6 +56,7 @@ namespace Excel_Generator.Utils
                 Main_TestText,
                 Main_SettingsButton,
                 Main_ClassMenuButton,
+                Main_AssignmentMenuButton,
                 Main_TitleText,
                 Main_SelectYearText,
                 Main_SelectYearTextNew,
@@ -86,7 +87,17 @@ namespace Excel_Generator.Utils
                 Class_SelectStudentText,
                 Class_SelectStudentTextNew,
                 Class_SelectStudentTextNewText,
-                Class_SelectStudentTextDeleteText
+                Class_SelectStudentTextDeleteText,
+                Assignment_TitleText,
+                Assignment_ActiveText,
+                Assignment_StudentListText,
+                Assignment_FlipSelectionText,
+                Assignment_ClearSelectionText,
+                Assignment_CreateAssignmentText,
+                Assignment_DeleteAssignmentText,
+                Assignment_GradeAssignmentText,
+                Assignment_ViewAssignmentText,
+                Assignment_UploadAssignmentText
             };
 
             private Dictionary<Phrase, SettingsObject> phrases;

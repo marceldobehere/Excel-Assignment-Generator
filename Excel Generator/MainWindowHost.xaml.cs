@@ -35,7 +35,8 @@ namespace Excel_Generator
             InitializeComponent();
             mainPage.Visibility = Visibility.Visible;
             settingsPage.Visibility = Visibility.Hidden;
-
+            classMenuPage.Visibility = Visibility.Hidden;
+            assignmentMenuPage.Visibility = Visibility.Hidden;
 
             doneInit = true;
             GlobalUpdateText();
@@ -49,6 +50,7 @@ namespace Excel_Generator
             globalHost.UpdateText();
             globalHost.settingsPage.UpdateText();
             globalHost.classMenuPage.UpdateText();
+            globalHost.assignmentMenuPage.UpdateText();
             globalHost.mainPage.UpdateText();
         }
 

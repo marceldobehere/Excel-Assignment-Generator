@@ -37,6 +37,7 @@ namespace Excel_Generator.Pages
             selectStudentLabel.Text = LocalizationManager.GetPhrase(Phrase.Class_SelectStudentText);
             selectStudentBox.ItemsSource = Settings.StudentList;
             deleteStudentButton.IsEnabled = !Settings.selectedStudent.Equals("");
+            MainWindowHost.globalHost.assignmentMenuPage.UpdateText();
         }
 
         private void closeClassMenuButton_Click(object sender, RoutedEventArgs e)
@@ -52,7 +53,7 @@ namespace Excel_Generator.Pages
             string selected = e.AddedItems[0] as string;
             if (selected.Equals(LocalizationManager.GetPhrase(Phrase.Class_SelectStudentTextNew)))
             {
-                Utils.Settings.selectedAssignment = "";
+                Utils.Settings.selectedStudent = "";
                 InputInfo info = Input.ShowInputBox(LocalizationManager.GetPhrase(Phrase.Input_TitleText), LocalizationManager.GetPhrase(Phrase.Class_SelectStudentTextNewText), LocalizationManager.GetPhrase(Phrase.Input_ConfirmButton), LocalizationManager.GetPhrase(Phrase.Input_CancelButton));
                 Console.WriteLine($"Result: {info.state} - \"{info.inputText}\"");
                 if (info.state == InputState.CONFIRMED)
@@ -128,7 +129,9 @@ namespace Excel_Generator.Pages
                     while (!reader.EndOfStream)
                     {
                         string line = reader.ReadLine();
-                        if (!line.Contains("\n") && line.Split(",").Length == 2)
+
+                        Utils.Utils.StudentObject student = Utils.Utils.ConvertStringToStudentStruct(line);
+                        if (student != null)
                             studentList.Add(line);
                     }
                 }

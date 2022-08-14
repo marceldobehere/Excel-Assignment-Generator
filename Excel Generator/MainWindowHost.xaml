@@ -10,6 +10,7 @@
     <Grid>
         <uc:MainPage x:Name="mainPage" Visibility="Visible"/>
         <uc:ClassMenuPage x:Name="classMenuPage" Visibility="Hidden"/>
+        <uc:AssignmentMenuPage x:Name="assignmentMenuPage" Visibility="Hidden"/>
         <uc:SettingsPage x:Name="settingsPage" Visibility="Hidden"/>
         <Button x:Name="settingsButton" Content="Settings" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Height="34" Width="85" Click="settingsButton_Click"/>
     </Grid>

@@ -35,6 +35,7 @@ namespace Excel_Generator.Pages
         {
             titleLabel.Text = LocalizationManager.GetPhrase(Phrase.Main_TitleText);
             classMenuButton.Content = LocalizationManager.GetPhrase(Phrase.Main_ClassMenuButton);
+            assignmentMenuButton.Content = LocalizationManager.GetPhrase(Phrase.Main_AssignmentMenuButton);
 
             selectYearLabel.Text = LocalizationManager.GetPhrase(Phrase.Main_SelectYearText);
             selectYearBox.ItemsSource = Settings.YearList;
@@ -49,6 +50,7 @@ namespace Excel_Generator.Pages
             selectAssignmentBox.ItemsSource = Settings.AssignmentList;
             deleteAssignmentButton.IsEnabled = !Settings.selectedAssignment.Equals("");
             openInFolderButton.IsEnabled = deleteAssignmentButton.IsEnabled;
+            assignmentMenuButton.IsEnabled = deleteAssignmentButton.IsEnabled;
         }
 
         private void selectYearBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -96,6 +98,7 @@ namespace Excel_Generator.Pages
             Utils.Settings.selectedAssignment = "";
             UpdateText();
             MainWindowHost.globalHost.classMenuPage.UpdateText();
+            MainWindowHost.globalHost.assignmentMenuPage.UpdateText();
         }
 
         private void selectClassBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -141,6 +144,7 @@ namespace Excel_Generator.Pages
             Settings.selectedStudent = "";
             UpdateText();
             MainWindowHost.globalHost.classMenuPage.UpdateText();
+            MainWindowHost.globalHost.assignmentMenuPage.UpdateText();
         }
 
         private void selectAssignmentBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -195,6 +199,7 @@ namespace Excel_Generator.Pages
             }
             UpdateText();
             MainWindowHost.globalHost.classMenuPage.UpdateText();
+            MainWindowHost.globalHost.assignmentMenuPage.UpdateText();
         }
 
         private void deleteYearButton_Click(object sender, RoutedEventArgs e)
@@ -208,6 +213,7 @@ namespace Excel_Generator.Pages
                 selectYearBox.SelectedValue = "";
                 UpdateText();
                 MainWindowHost.globalHost.classMenuPage.UpdateText();
+                MainWindowHost.globalHost.assignmentMenuPage.UpdateText();
             }
         }
 
@@ -222,6 +228,7 @@ namespace Excel_Generator.Pages
                 selectClassBox.SelectedValue = "";
                 UpdateText();
                 MainWindowHost.globalHost.classMenuPage.UpdateText();
+                MainWindowHost.globalHost.assignmentMenuPage.UpdateText();
             }
         }
 
@@ -236,17 +243,24 @@ namespace Excel_Generator.Pages
                 selectAssignmentBox.SelectedValue = "";
                 UpdateText();
                 MainWindowHost.globalHost.classMenuPage.UpdateText();
+                MainWindowHost.globalHost.assignmentMenuPage.UpdateText();
             }
         }
 
         private void openInFolderButton_Click(object sender, RoutedEventArgs e)
         {
+            Console.WriteLine($"> Opening: \"{"Jahre/" + Settings.selectedYear + "/Klassen/" + Settings.selectedClass + "/Aufgaben/" + Settings.selectedAssignment}\"");
             Utils.Utils.WindowsExplorerOpen(Utils.Settings.SETTINGS_PATH + "Jahre/" + Settings.selectedYear + "/Klassen/" + Settings.selectedClass + "/Aufgaben/" + Settings.selectedAssignment);
         }
 
         private void classMenuButton_Click(object sender, RoutedEventArgs e)
         {
             MainWindowHost.globalHost.classMenuPage.Visibility = Visibility.Visible;
+        }
+
+        private void assignmentMenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindowHost.globalHost.assignmentMenuPage.Visibility = Visibility.Visible;
         }
     }
 }
