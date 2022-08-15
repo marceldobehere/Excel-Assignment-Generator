@@ -237,11 +237,9 @@ namespace Excel_Generator.Pages
         }
 
         // TODO:
-        // Add Bindings to Excel Test App
-        // - Grade Assignments
-        // - View Assignments
 
         // Add Manual Grading
+        // Make API Save grading data/stats to a file
         // Improve Vorlage
         // Add Student Statistics
         // Add Class Statistics
@@ -484,8 +482,29 @@ namespace Excel_Generator.Pages
 
         private void viewAssignmentButton_Click(object sender, RoutedEventArgs e)
         {
+            string assignmentFolderPath = Settings.SETTINGS_PATH + "Jahre/" +
+                                                      Settings.selectedYear + "/Klassen/" +
+                                                      Settings.selectedClass + "/Aufgaben/" +
+                                                      Settings.selectedAssignment + "/";
 
-            CreateCheckBoxList();
+            List<StudentObject> selectedStudents = GetSelectedStudents();
+
+            {
+                Console.WriteLine("\nFertig");
+                Dictionary<int, string> reviewedIds = Excel_API.MainExcelAPI.GetStudentIDsAndFilenamesFromFolder(assignmentFolderPath + "Fertige Aufgaben");
+
+                List<string> toGrade = new List<string>();
+
+                foreach (var student in selectedStudents)
+                    if (reviewedIds.ContainsKey(student.id))
+                    {
+                        Console.WriteLine($" - Showing: {student.name}");
+                        Console.WriteLine($" - Path: {reviewedIds[student.id]}");
+                        Utils.Utils.OpenWithDefaultProgram(reviewedIds[student.id]);
+                    }
+
+            }
+
         }
 
         private void uploadAssignmentButton_Click(object sender, RoutedEventArgs e)

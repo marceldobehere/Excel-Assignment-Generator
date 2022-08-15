@@ -171,6 +171,15 @@ namespace Excel_Generator.Utils
             return builder.ToString();
         }
 
+        public static void OpenWithDefaultProgram(string path)
+        {
+            //using Process appLauncher = new Process();
+            //appLauncher.StartInfo.FileName = path;
+            //appLauncher.Start();
+            //System.Diagnostics.Process.Start(path);
+            CommandLine(path, $"start \"\" \"{path}\"");
+        }
+
         public static string UnEscapeString(string original)
         {
             StringBuilder builder = new StringBuilder();
