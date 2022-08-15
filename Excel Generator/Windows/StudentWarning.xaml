@@ -1,0 +1,17 @@
+﻿<Window x:Class="Excel_Generator.Windows.StudentWarning"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Excel_Generator.Windows"
+        mc:Ignorable="d"
+        Title="StudentWarning" Height="240" Width="440" ResizeMode="NoResize">
+    <Grid>
+        <Button x:Name="yesButton" Content="Ja" HorizontalAlignment="Left" Margin="311,136,0,0" VerticalAlignment="Top" Height="54" Width="101" Foreground="#FF005320" FontSize="16" Background="#FFD3E0D5" FontWeight="Bold" Click="yesButton_Click"/>
+        <Button x:Name="noButton" Content="Nein" HorizontalAlignment="Left" VerticalAlignment="Top" Height="54" Width="100" Foreground="#FF530000" FontSize="16" Background="#FFCFBFBF" FontWeight="Bold" Margin="193,136,0,0" Click="noButton_Click"/>
+        <TextBlock x:Name="studentStartText" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="144" FontSize="20" Height="28"><Run Language="de-de" Text="Der Schüler"/></TextBlock>
+        <TextBlock x:Name="StudentWarningText" HorizontalAlignment="Center" Margin="0,43,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="420" FontSize="20" Height="86"><Run Text="hat bereits diese Aufgabe"/><Run Language="de-de" Text="."/><LineBreak/><Run Language="de-de" Text="Wollen Sie die Aufgabe neu erstellen?"/></TextBlock>
+        <TextBlock x:Name="StudentNameText" HorizontalAlignment="Left" Margin="159,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="231" FontSize="20" Height="28" Background="#FFCECECE" FontWeight="Bold"><Run Language="de-de" Text="(Schülername)"/></TextBlock>
+
+    </Grid>
+</Window>

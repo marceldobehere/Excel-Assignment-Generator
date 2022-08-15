@@ -1,4 +1,5 @@
 ﻿using Excel_Generator.Utils;
+using Excel_Generator.Windows;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static Excel_Generator.Pages.AssignmentMenuPage.CheckBoxUnit;
 using static Excel_Generator.Utils.LocalizationManager.LanguagePhraseList;
 using static Excel_Generator.Utils.Utils;
 
@@ -130,6 +132,8 @@ namespace Excel_Generator.Pages
                     StudentCheckBoxList.Add(new CheckBoxUnit(studentObj.name, studentObj.id));
             }
 
+            UpdateCheckBoxColors();
+
             studentList.ItemsSource = StudentCheckBoxList;
         }
 
@@ -233,10 +237,7 @@ namespace Excel_Generator.Pages
         }
 
         // TODO:
-        // Change colour of students depending on if they have an assignment and if its submitted
         // Add Bindings to Excel Test App
-        // - Make it not delete everything when generating
-        // - Delete Assignments
         // - Grade Assignments
         // - View Assignments
 
@@ -245,39 +246,246 @@ namespace Excel_Generator.Pages
         // Add Student Statistics
         // Add Class Statistics
 
+        private void UpdateCheckBoxColors()
+        {
+            if (Settings.selectedYear == "")
+                return;
+            if (Settings.selectedClass == "")
+                return;
+            if (Settings.selectedAssignment == "")
+                return;
+
+            string assignmentFolderPath = Settings.SETTINGS_PATH + "Jahre/" +
+                                          Settings.selectedYear + "/Klassen/" +
+                                          Settings.selectedClass + "/Aufgaben/" +
+                                          Settings.selectedAssignment + "/";
+
+
+            Console.WriteLine("\nLösungen");
+            List<int> solutionIds = Excel_API.MainExcelAPI.GetStudentIDsFromFolder(assignmentFolderPath + "Loesungen/EXCEL");
+            Console.WriteLine("\nAbgegeben");
+            List<int> uploadedIds = Excel_API.MainExcelAPI.GetStudentIDsFromFolder(assignmentFolderPath + "Abgegebene Aufgaben");
+            Console.WriteLine("\nFertig");
+            List<int> reviewedIds = Excel_API.MainExcelAPI.GetStudentIDsFromFolder(assignmentFolderPath + "Fertige Aufgaben");
+
+            foreach (var student in StudentCheckBoxList)
+            {
+                if (reviewedIds.Contains(student.Id))
+                    student.CurrentAssignmentState = AssignmentState.ASSIGNMENT_DONE;
+                else if (uploadedIds.Contains(student.Id))
+                    student.CurrentAssignmentState = AssignmentState.ASSIGNMENT_IN_REVIEW;
+                else if (solutionIds.Contains(student.Id))
+                    student.CurrentAssignmentState = AssignmentState.ASSIGNMENT_NOT_UPLOADED;
+                else
+                    student.CurrentAssignmentState = AssignmentState.NO_ASSIGNMENT_CREATED;
+            }
+        }
 
         private void addAssignmentButton_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Check for overlapping students
-
-            string assignmentFolderPath = Settings.SETTINGS_PATH      + "Jahre/"      +
-                                          Settings.selectedYear       + "/Klassen/"   +
-                                          Settings.selectedClass      + "/Aufgaben/"  +
+            string assignmentFolderPath = Settings.SETTINGS_PATH + "Jahre/" +
+                                          Settings.selectedYear + "/Klassen/" +
+                                          Settings.selectedClass + "/Aufgaben/" +
                                           Settings.selectedAssignment + "/";
 
             string solFile = assignmentFolderPath + "Vorlage.xlsx";
             string solFolder = assignmentFolderPath + "Loesungen";
             string queFolder = assignmentFolderPath + "Aufgaben";
 
-            Excel_API.MainExcelAPI.ErrorRes error = Excel_API.MainExcelAPI.GenerateAssignmentsForStudents(GetSelectedStudents().ToArray(), solFile, solFolder, queFolder);
-            if (error != null)
-                MessageBox.Show($"Error: {error.exception}");
 
+            List<StudentObject> selectedStudents = GetSelectedStudents();
+
+
+            {
+                Console.WriteLine("\nLösungen");
+                List<int> solutionIds = Excel_API.MainExcelAPI.GetStudentIDsFromFolder(assignmentFolderPath + "Loesungen/EXCEL");
+
+                for (int i = 0; i < selectedStudents.Count; i++)
+                {
+                    var student = selectedStudents[i];
+
+                    if (solutionIds.Contains(student.id))
+                    {
+                        // Student already has assignment
+
+                        var res = StudentWarning.ShowWarningBox(
+                            LocalizationManager.GetPhrase(Phrase.Warning_TitleText),
+                            LocalizationManager.GetPhrase(Phrase.Warning_StudentStartText),
+                            student.name,
+                            LocalizationManager.GetPhrase(Phrase.Warning_StudentDuplicateText),
+                            LocalizationManager.GetPhrase(Phrase.Warning_YesButton),
+                            LocalizationManager.GetPhrase(Phrase.Warning_NoButton)
+                            );
+
+                        if (res == StudentWarning.InputState.NO)
+                        {
+                            selectedStudents.RemoveAt(i);
+                            i--;
+                        }
+                    }
+                }
+            }
+
+
+
+            Excel_API.MainExcelAPI.ErrorRes error = Excel_API.MainExcelAPI.GenerateAssignmentsForStudents(selectedStudents.ToArray(), solFile, solFolder, queFolder);
+            if (error != null)
+                MessageBox.Show($"Error: {error.exception}", "Error");
+
+            CreateCheckBoxList();
         }
 
         private void removeAssignmentButton_Click(object sender, RoutedEventArgs e)
         {
+            string assignmentFolderPath = Settings.SETTINGS_PATH + "Jahre/" +
+                              Settings.selectedYear + "/Klassen/" +
+                              Settings.selectedClass + "/Aufgaben/" +
+                              Settings.selectedAssignment + "/";
 
+            List<StudentObject> selectedStudents = GetSelectedStudents();
+
+            {
+                Console.WriteLine("\nAbgegeben");
+                Dictionary<int, string> uploadedIds = Excel_API.MainExcelAPI.GetStudentIDsAndFilenamesFromFolder(assignmentFolderPath + "Abgegebene Aufgaben");
+
+
+
+                for (int i = 0; i < selectedStudents.Count; i++)
+                {
+                    var student = selectedStudents[i];
+
+                    if (uploadedIds.ContainsKey(student.id))
+                    {
+                        // Student already has assignment
+
+                        var res = StudentWarning.ShowWarningBox(
+                            LocalizationManager.GetPhrase(Phrase.Warning_TitleText),
+                            LocalizationManager.GetPhrase(Phrase.Warning_StudentStartText),
+                            student.name,
+                            LocalizationManager.GetPhrase(Phrase.Warning_StudentDoneAssignmentText),
+                            LocalizationManager.GetPhrase(Phrase.Warning_YesButton),
+                            LocalizationManager.GetPhrase(Phrase.Warning_NoButton)
+                            );
+
+                        if (res == StudentWarning.InputState.NO)
+                        {
+                            selectedStudents.RemoveAt(i);
+                            i--;
+                        }
+                    }
+                }
+
+
+                if (selectedStudents.Count == 0)
+                    return;
+
+
+                Console.WriteLine("\nLösungen");
+                Dictionary<int, string> solutionIds = Excel_API.MainExcelAPI.GetStudentIDsAndFilenamesFromFolder(assignmentFolderPath + "Loesungen/EXCEL");
+                Console.WriteLine("\nAbgegeben");
+                //Dictionary<int, string>uploadedIds = Excel_API.MainExcelAPI.GetStudentIDsAndFilenamesFromFolder(assignmentFolderPath + "Abgegebene Aufgaben");
+                Console.WriteLine("\nFertig");
+                Dictionary<int, string> reviewedIds = Excel_API.MainExcelAPI.GetStudentIDsAndFilenamesFromFolder(assignmentFolderPath + "Fertige Aufgaben");
+
+
+
+                foreach (var student in selectedStudents)
+                {
+                    Console.WriteLine($" - Deleting data from: {student.name}");
+                    if (uploadedIds.ContainsKey(student.id))
+                        File.Delete(uploadedIds[student.id]);
+                    if (reviewedIds.ContainsKey(student.id))
+                        File.Delete(reviewedIds[student.id]);
+
+                    if (solutionIds.ContainsKey(student.id))
+                    {
+                        string name = System.IO.Path.GetFileNameWithoutExtension(solutionIds[student.id]);
+                        string tempPath = Directory.GetParent(System.IO.Path.GetDirectoryName(solutionIds[student.id])).FullName;
+
+                        Console.WriteLine($" - Name: {name}");
+                        Console.WriteLine($" - Path: {tempPath}");
+                        Console.WriteLine();
+
+                        File.Delete(tempPath + "/EXCEL/" + name + ".xlsx");
+                        File.Delete(tempPath + "/TXT/" + name + ".txt");
+
+                    }
+                }
+
+            }
+
+            CreateCheckBoxList();
         }
 
         private void checkAssignmentButton_Click(object sender, RoutedEventArgs e)
         {
+            string assignmentFolderPath = Settings.SETTINGS_PATH + "Jahre/" +
+                                          Settings.selectedYear + "/Klassen/" +
+                                          Settings.selectedClass + "/Aufgaben/" +
+                                          Settings.selectedAssignment + "/";
 
+            List<StudentObject> selectedStudents = GetSelectedStudents();
+
+            {
+                Console.WriteLine("\nFertig");
+                Dictionary<int, string> reviewedIds = Excel_API.MainExcelAPI.GetStudentIDsAndFilenamesFromFolder(assignmentFolderPath + "Fertige Aufgaben");
+
+
+
+                for (int i = 0; i < selectedStudents.Count; i++)
+                {
+                    var student = selectedStudents[i];
+
+                    if (reviewedIds.ContainsKey(student.id))
+                    {
+                        // Student already has assignment
+
+                        var res = StudentWarning.ShowWarningBox(
+                            LocalizationManager.GetPhrase(Phrase.Warning_TitleText),
+                            LocalizationManager.GetPhrase(Phrase.Warning_StudentStartText),
+                            student.name,
+                            LocalizationManager.GetPhrase(Phrase.Warning_StudentReviewedAssignmentText),
+                            LocalizationManager.GetPhrase(Phrase.Warning_YesButton),
+                            LocalizationManager.GetPhrase(Phrase.Warning_NoButton)
+                            );
+
+                        if (res == StudentWarning.InputState.NO)
+                        {
+                            selectedStudents.RemoveAt(i);
+                            i--;
+                        }
+                    }
+                }
+
+
+                if (selectedStudents.Count == 0)
+                    return;
+
+
+                Console.WriteLine("\nAbgegeben");
+                Dictionary<int, string> uploadedIds = Excel_API.MainExcelAPI.GetStudentIDsAndFilenamesFromFolder(assignmentFolderPath + "Abgegebene Aufgaben");
+
+                List<string> toGrade = new List<string>();
+
+                foreach (var student in selectedStudents)
+                    if (uploadedIds.ContainsKey(student.id))
+                    {
+                        Console.WriteLine($" - Grading: {student.name}");
+                        toGrade.Add(uploadedIds[student.id]);
+                    }
+
+                if (selectedStudents.Count == 0)
+                    return;
+                Excel_API.MainExcelAPI.GradeWorksheets(toGrade.ToArray(), assignmentFolderPath + "Loesungen", assignmentFolderPath + "Fertige Aufgaben");
+            }
+
+            CreateCheckBoxList();
         }
 
         private void viewAssignmentButton_Click(object sender, RoutedEventArgs e)
         {
 
+            CreateCheckBoxList();
         }
 
         private void uploadAssignmentButton_Click(object sender, RoutedEventArgs e)
@@ -296,15 +504,15 @@ namespace Excel_Generator.Pages
             foreach (string filename in test.FileNames)
             {
                 Console.WriteLine($" - {filename}");
-                string newFilename = Settings.SETTINGS_PATH      + "Jahre/"                +
-                                     Settings.selectedYear       + "/Klassen/"             +
-                                     Settings.selectedClass      + "/Aufgaben/"            +
-                                     Settings.selectedAssignment + "/Abgegebene Aufgaben/" + 
+                string newFilename = Settings.SETTINGS_PATH + "Jahre/" +
+                                     Settings.selectedYear + "/Klassen/" +
+                                     Settings.selectedClass + "/Aufgaben/" +
+                                     Settings.selectedAssignment + "/Abgegebene Aufgaben/" +
                                      System.IO.Path.GetFileName(filename);
                 File.Copy(filename, newFilename, true);
             }
 
-
+            CreateCheckBoxList();
         }
     }
 }

@@ -69,6 +69,80 @@ namespace Excel_Generator.Excel_API
             return null;
         }
 
+        public static Dictionary<int, string> GetStudentIDsAndFilenamesFromFolder(string foldername)
+        {
+            Dictionary<int, string> studentData = new Dictionary<int, string>();
+
+            Console.WriteLine("IDs:");
+
+            foreach (string file in Directory.GetFiles(foldername))
+            {
+                if (!file.EndsWith(".xlsx"))
+                    continue;
+
+                try
+                {
+                    IWorkbook book = WorkbookFactory.Create(file);
+
+                    ISheet main = book.GetSheetAt(0);
+
+                    int id = (int)(GetCellFromXY(main, 0, 999).NumericCellValue - 100);
+
+                    studentData.Add(id, file);
+                    Console.WriteLine($" - {id}");
+
+                    book.Close();
+                }
+                catch (Exception e)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Bei der Datei \"{file}\" ist ein Fehler aufgetreten! ({e})");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+            }
+
+
+
+            return studentData;
+        }
+
+        public static List<int> GetStudentIDsFromFolder(string foldername)
+        {
+            List<int> studentIds = new List<int>();
+
+            Console.WriteLine("IDs:");
+
+            foreach (string file in Directory.GetFiles(foldername))
+            {
+                if (!file.EndsWith(".xlsx"))
+                    continue;
+
+                try
+                {
+                    IWorkbook book = WorkbookFactory.Create(file);
+
+                    ISheet main = book.GetSheetAt(0);
+
+                    int id = (int)(GetCellFromXY(main, 0, 999).NumericCellValue - 100);
+
+                    studentIds.Add(id);
+                    Console.WriteLine($" - {id}");
+
+                    book.Close();
+                }
+                catch (Exception e)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Bei der Datei \"{file}\" ist ein Fehler aufgetreten! ({e})");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+            }
+
+
+
+            return studentIds;
+        }
+
 
         public static void FakeMain(string[] args)
         {
@@ -91,7 +165,7 @@ namespace Excel_Generator.Excel_API
 
             //if (input.Equals("1"))
             //{
-            //    string solutionFilePath = "Vorlage.xlsx", solutionFolderPath = "Lösungen", questionFolderPath = "Aufgaben";
+            //    string solutionFilePath = "Vorlage.xlsx", solutionFolderPath = "Loesungen", questionFolderPath = "Aufgaben";
 
             //    Console.WriteLine("Bitte geben Sie den Pfad zur Angabedatei an.");
             //    while (!File.Exists(solutionFilePath))
@@ -103,13 +177,13 @@ namespace Excel_Generator.Excel_API
             //    Console.WriteLine();
 
 
-            //    Console.WriteLine("Bitte geben Sie den Pfad zum Lösungsordner an.");
+            //    Console.WriteLine("Bitte geben Sie den Pfad zum Loesungsordner an.");
             //    while (!Directory.Exists(solutionFolderPath))
             //    {
             //        Console.Write("> ");
             //        solutionFolderPath = Console.ReadLine();
             //    }
-            //    Console.WriteLine($"Lösungsordner: \"{solutionFolderPath}\"");
+            //    Console.WriteLine($"Loesungsordner: \"{solutionFolderPath}\"");
             //    Console.WriteLine();
 
 
@@ -149,7 +223,7 @@ namespace Excel_Generator.Excel_API
             //}
             //else if (input.Equals("2"))
             //{
-            //    string solutionFolderPath = "Lösungen", questionFolderPath = "Abgegebene Aufgaben", gradedFolderPath = "Verbesserte Aufgaben";
+            //    string solutionFolderPath = "Loesungen", questionFolderPath = "Abgegebene Aufgaben", gradedFolderPath = "Verbesserte Aufgaben";
 
             //    Console.WriteLine("Bitte geben Sie den Pfad zu den Angaben an.");
             //    while (!Directory.Exists(questionFolderPath))
@@ -160,13 +234,13 @@ namespace Excel_Generator.Excel_API
             //    Console.WriteLine($"Angabeordner: \"{questionFolderPath}\"");
             //    Console.WriteLine();
 
-            //    Console.WriteLine("Bitte geben Sie den Pfad zum Lösungsordner an.");
+            //    Console.WriteLine("Bitte geben Sie den Pfad zum Loesungsordner an.");
             //    while (!Directory.Exists(solutionFolderPath))
             //    {
             //        Console.Write("> ");
             //        solutionFolderPath = Console.ReadLine();
             //    }
-            //    Console.WriteLine($"Lösungsordner: \"{solutionFolderPath}\"");
+            //    Console.WriteLine($"Loesungsordner: \"{solutionFolderPath}\"");
             //    Console.WriteLine();
 
 
@@ -228,23 +302,25 @@ namespace Excel_Generator.Excel_API
 
 
             {
-                string[] files = Directory.GetFiles(questionFolderPath);
-                foreach (string file in files)
-                    File.Delete(file);
+                //string[] files = Directory.GetFiles(questionFolderPath);
+                //foreach (string file in files)
+                //    File.Delete(file);
 
-                files = Directory.GetFiles(solutionFolderPath);
-                foreach (string file in files)
-                    File.Delete(file);
+                //files = Directory.GetFiles(solutionFolderPath);
+                //foreach (string file in files)
+                //    File.Delete(file);
 
-                files = Directory.GetFiles(solutionFolderPath + "/TXT");
-                foreach (string file in files)
-                    File.Delete(file);
+                //files = Directory.GetFiles(solutionFolderPath + "/TXT");
+                //foreach (string file in files)
+                //    File.Delete(file);
 
-                files = Directory.GetFiles(solutionFolderPath + "/EXCEL");
-                foreach (string file in files)
-                    File.Delete(file);
+                //files = Directory.GetFiles(solutionFolderPath + "/EXCEL");
+                //foreach (string file in files)
+                //    File.Delete(file);
             }
 
+            if (students.Length == 0)
+                return;
 
             ConfigThing config = ParseConfig(OGcfgSheet);
 
@@ -273,7 +349,7 @@ namespace Excel_Generator.Excel_API
 
                 {
                     XSSFWorkbook solBook = new XSSFWorkbook();
-                    OGsolutions.CopyTo(solBook, "Lösung", true, true);
+                    OGsolutions.CopyTo(solBook, "Loesung", true, true);
                     //XSSFFormulaEvaluator.EvaluateAllFormulaCells(solBook);
                     sol[i] = solBook.GetSheetAt(0);
                     eval[i] = new XSSFFormulaEvaluator(solBook);
@@ -283,7 +359,7 @@ namespace Excel_Generator.Excel_API
 
                 {
                     XSSFWorkbook solBook = new XSSFWorkbook();
-                    OGquestions.CopyTo(solBook, "Lösung", true, true);
+                    OGquestions.CopyTo(solBook, "Loesung", true, true);
                     //XSSFFormulaEvaluator.EvaluateAllFormulaCells(solBook);
                     sol2[i] = solBook.GetSheetAt(0);
                     eval2[i] = new XSSFFormulaEvaluator(solBook);
@@ -401,7 +477,7 @@ namespace Excel_Generator.Excel_API
 
 
 
-            Console.WriteLine("> Fülle die Lösungen ein...");
+            Console.WriteLine("> Fülle die Loesungen ein...");
             //Console.WriteLine("Cells:");
 
             for (int y = 0; y < cells.GetLength(0); y++)
@@ -423,13 +499,14 @@ namespace Excel_Generator.Excel_API
 
                             ICell Tcell = GetCellFromXY(sheet, x, y);
 
-
                             CellValue Cval = eval[i].Evaluate(GetCellFromXY(sol[i], x, y));
                             //Console.WriteLine($"Wert bei {x} {y}: {GetCellValueAsString(Cval)}");
 
                             sols[i].AddVal(x, y, GetCellValueAsString(Cval), config.scoreDict.Getval(col));
 
                             SetCellFromXY(sol2[i], GetCellValueAsObject(Cval), x, y);
+
+                            SetCellFromXY(sol2[i], 100 + students[i].id, 0, 999); //101+i
 
                             try
                             {
@@ -447,7 +524,7 @@ namespace Excel_Generator.Excel_API
                 }
                 //Console.WriteLine();
             }
-            Console.WriteLine("> Lösungen ausgefüllt.");
+            Console.WriteLine("> Loesungen ausgefüllt.");
             Console.WriteLine();
 
 
@@ -488,13 +565,13 @@ namespace Excel_Generator.Excel_API
 
 
 
-            Console.WriteLine("> Speichere Angaben und Lösungen...");
+            Console.WriteLine("> Speichere Angaben und Loesungen...");
             for (int i = 0; i < amountOfStudents; i++)
             {
                 Console.WriteLine($"> Angabe {i + 1}/{amountOfStudents}.");
-                string Qname = $"{questionFolderPath}/Angabe - {students[i].name}.xlsx";
-                string Sname = $"{solutionFolderPath}/TXT/Lösung {students[i].id}.txt";
-                string Sname2 = $"{solutionFolderPath}/EXCEL/Lösung {students[i].id}.xlsx";
+                string Qname = $"{questionFolderPath}/Angabe {students[i].name}.xlsx";
+                string Sname = $"{solutionFolderPath}/TXT/Loesung {students[i].id}.txt";
+                string Sname2 = $"{solutionFolderPath}/EXCEL/Loesung {students[i].id}.xlsx";
 
                 XSSFWorkbook tempBook = workbooks[i];
 
@@ -671,16 +748,15 @@ namespace Excel_Generator.Excel_API
         }
 
 
-        static void GradeWorksheets(string questionFolderPath, string solutionFolderPath, string gradedFolderPath)
+        public static void GradeWorksheets(string[] worksheetFilenames, string solutionFolderPath, string gradedFolderPath)
         {
-
             {
                 if (!Directory.Exists(gradedFolderPath))
                     Directory.CreateDirectory(gradedFolderPath);
 
-                string[] files_ = Directory.GetFiles(gradedFolderPath);
-                foreach (string file in files_)
-                    File.Delete(file);
+                //string[] files_ = Directory.GetFiles(gradedFolderPath);
+                //foreach (string file in files_)
+                //    File.Delete(file);
             }
 
             GradingConfig cfg = GradingConfig.LoadFromFile(solutionFolderPath + "/config.cfg");
@@ -691,9 +767,7 @@ namespace Excel_Generator.Excel_API
             Console.WriteLine("----------------------------------------------------------");
             Console.WriteLine();
 
-
-            string[] files = Directory.GetFiles(questionFolderPath);
-            foreach (string file in files)
+            foreach (string file in worksheetFilenames)
             {
                 Console.WriteLine($"> Schaue Datei \"{file}\" an:");
 
@@ -706,7 +780,7 @@ namespace Excel_Generator.Excel_API
                     int id = (int)(GetCellFromXY(main, 0, 999).NumericCellValue - 100);
                     //Console.WriteLine($"ID: {id}");
 
-                    GradeWorkSheet(book, $"{solutionFolderPath}/TXT/Lösung {id}.txt", file, true, id, $"{gradedFolderPath}/{Path.GetFileName(file)}", cfg);
+                    GradeWorkSheet(book, $"{solutionFolderPath}/TXT/Loesung {id}.txt", file, true, id, $"{gradedFolderPath}/{Path.GetFileName(file)}", cfg);
 
                     book.Close();
                 }
@@ -723,7 +797,7 @@ namespace Excel_Generator.Excel_API
             Console.WriteLine("----------------------------------------------------------");
             Console.WriteLine();
 
-            foreach (string file in files)
+            foreach (string file in worksheetFilenames)
             {
                 try
                 {
@@ -734,7 +808,7 @@ namespace Excel_Generator.Excel_API
                     int id = (int)(GetCellFromXY(main, 0, 999).NumericCellValue - 100);
                     //Console.WriteLine($"ID: {id}");
 
-                    GradeWorkSheet(book, $"{solutionFolderPath}/TXT/Lösung {id}.txt", file, false, id, "", cfg);
+                    GradeWorkSheet(book, $"{solutionFolderPath}/TXT/Loesung {id}.txt", file, false, id, "", cfg);
 
                     book.Close();
                 }
