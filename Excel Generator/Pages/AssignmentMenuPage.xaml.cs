@@ -238,11 +238,15 @@ namespace Excel_Generator.Pages
 
         // TODO:
 
-        // Add Manual Grading
         // Make API Save grading data/stats to a file
-        // Improve Vorlage
+
+        // Add Assignment Statistics
         // Add Student Statistics
         // Add Class Statistics
+        
+        // Add Manual Grading
+        // Improve Vorlage
+
 
         private void UpdateCheckBoxColors()
         {
