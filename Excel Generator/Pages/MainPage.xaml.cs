@@ -166,9 +166,12 @@ namespace Excel_Generator.Pages
                         Directory.CreateDirectory(pathToAssignment);
                         Directory.CreateDirectory(pathToAssignment + "/Aufgaben");
                         Directory.CreateDirectory(pathToAssignment + "/Abgegebene Aufgaben");
+                        Directory.CreateDirectory(pathToAssignment + "/Fertige Aufgaben");
+                        Directory.CreateDirectory(pathToAssignment + "/Fertige Aufgaben/EXCEL");
+                        Directory.CreateDirectory(pathToAssignment + "/Fertige Aufgaben/TXT");
                         Directory.CreateDirectory(pathToAssignment + "/Loesungen");
                         selectAssignmentBox.ItemsSource = Settings.AssignmentList;
-                        Utils.Settings.selectedAssignment = info.inputText;
+                        Settings.selectedAssignment = info.inputText;
                         selectAssignmentBox.SelectedValue = info.inputText;
 
 
@@ -263,9 +266,5 @@ namespace Excel_Generator.Pages
             MainWindowHost.globalHost.assignmentMenuPage.Visibility = Visibility.Visible;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            Excel_API.MainExcelAPI.FakeMain(new string[0]);
-        }
     }
 }

@@ -237,13 +237,10 @@ namespace Excel_Generator.Pages
         }
 
         // TODO:
-
-        // Make API Save grading data/stats to a file
-
         // Add Assignment Statistics
         // Add Student Statistics
         // Add Class Statistics
-        
+
         // Add Manual Grading
         // Improve Vorlage
 
@@ -268,7 +265,7 @@ namespace Excel_Generator.Pages
             Console.WriteLine("\nAbgegeben");
             List<int> uploadedIds = Excel_API.MainExcelAPI.GetStudentIDsFromFolder(assignmentFolderPath + "Abgegebene Aufgaben");
             Console.WriteLine("\nFertig");
-            List<int> reviewedIds = Excel_API.MainExcelAPI.GetStudentIDsFromFolder(assignmentFolderPath + "Fertige Aufgaben");
+            List<int> reviewedIds = Excel_API.MainExcelAPI.GetStudentIDsFromFolder(assignmentFolderPath + "Fertige Aufgaben/EXCEL");
 
             foreach (var student in StudentCheckBoxList)
             {
@@ -387,7 +384,7 @@ namespace Excel_Generator.Pages
                 Console.WriteLine("\nAbgegeben");
                 //Dictionary<int, string>uploadedIds = Excel_API.MainExcelAPI.GetStudentIDsAndFilenamesFromFolder(assignmentFolderPath + "Abgegebene Aufgaben");
                 Console.WriteLine("\nFertig");
-                Dictionary<int, string> reviewedIds = Excel_API.MainExcelAPI.GetStudentIDsAndFilenamesFromFolder(assignmentFolderPath + "Fertige Aufgaben");
+                Dictionary<int, string> reviewedIds = Excel_API.MainExcelAPI.GetStudentIDsAndFilenamesFromFolder(assignmentFolderPath + "Fertige Aufgaben/EXCEL");
 
 
 
@@ -396,8 +393,20 @@ namespace Excel_Generator.Pages
                     Console.WriteLine($" - Deleting data from: {student.name}");
                     if (uploadedIds.ContainsKey(student.id))
                         File.Delete(uploadedIds[student.id]);
+                    
                     if (reviewedIds.ContainsKey(student.id))
+                    {
+                        string name = System.IO.Path.GetFileNameWithoutExtension(solutionIds[student.id]);
+                        string tempPath = Directory.GetParent(System.IO.Path.GetDirectoryName(solutionIds[student.id])).FullName;
+
+                        Console.WriteLine($" - Name: {name}");
+                        Console.WriteLine($" - Path: {tempPath}");
+                        Console.WriteLine();
+
+                        //File.Delete(tempPath + "/EXCEL/" + name + ".xlsx");
                         File.Delete(reviewedIds[student.id]);
+                        File.Delete(tempPath + "/TXT/" + name + ".txt");
+                    }
 
                     if (solutionIds.ContainsKey(student.id))
                     {
@@ -430,7 +439,7 @@ namespace Excel_Generator.Pages
 
             {
                 Console.WriteLine("\nFertig");
-                Dictionary<int, string> reviewedIds = Excel_API.MainExcelAPI.GetStudentIDsAndFilenamesFromFolder(assignmentFolderPath + "Fertige Aufgaben");
+                Dictionary<int, string> reviewedIds = Excel_API.MainExcelAPI.GetStudentIDsAndFilenamesFromFolder(assignmentFolderPath + "Fertige Aufgaben/EXCEL");
 
 
 
@@ -467,13 +476,14 @@ namespace Excel_Generator.Pages
                 Console.WriteLine("\nAbgegeben");
                 Dictionary<int, string> uploadedIds = Excel_API.MainExcelAPI.GetStudentIDsAndFilenamesFromFolder(assignmentFolderPath + "Abgegebene Aufgaben");
 
-                List<string> toGrade = new List<string>();
+               
+                List<(StudentObject student, string path)> toGrade = new List<(StudentObject student, string path)>();
 
                 foreach (var student in selectedStudents)
                     if (uploadedIds.ContainsKey(student.id))
                     {
                         Console.WriteLine($" - Grading: {student.name}");
-                        toGrade.Add(uploadedIds[student.id]);
+                        toGrade.Add((student, uploadedIds[student.id]));
                     }
 
                 if (selectedStudents.Count == 0)
@@ -495,7 +505,7 @@ namespace Excel_Generator.Pages
 
             {
                 Console.WriteLine("\nFertig");
-                Dictionary<int, string> reviewedIds = Excel_API.MainExcelAPI.GetStudentIDsAndFilenamesFromFolder(assignmentFolderPath + "Fertige Aufgaben");
+                Dictionary<int, string> reviewedIds = Excel_API.MainExcelAPI.GetStudentIDsAndFilenamesFromFolder(assignmentFolderPath + "Fertige Aufgaben/EXCEL");
 
                 List<string> toGrade = new List<string>();
 
@@ -504,7 +514,7 @@ namespace Excel_Generator.Pages
                     {
                         Console.WriteLine($" - Showing: {student.name}");
                         Console.WriteLine($" - Path: {reviewedIds[student.id]}");
-                        Utils.Utils.OpenWithDefaultProgram(reviewedIds[student.id]);
+                        OpenWithDefaultProgram(reviewedIds[student.id]);
                     }
 
             }
@@ -530,7 +540,7 @@ namespace Excel_Generator.Pages
                 string newFilename = Settings.SETTINGS_PATH + "Jahre/" +
                                      Settings.selectedYear + "/Klassen/" +
                                      Settings.selectedClass + "/Aufgaben/" +
-                                     Settings.selectedAssignment + "/Abgegebene Aufgaben/" +
+                                     Settings.selectedAssignment + "/Abgegebene Aufgaben/EXCEL/" +
                                      System.IO.Path.GetFileName(filename);
                 File.Copy(filename, newFilename, true);
             }

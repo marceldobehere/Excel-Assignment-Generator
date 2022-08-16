@@ -12,6 +12,7 @@ using NPOI.XSSF.UserModel;
 using NPOI.SS.Util;
 using System.Globalization;
 using static Excel_Generator.Excel_API.Utils.Utils.SolutionClass;
+using static Excel_Generator.Utils.Utils;
 
 namespace Excel_Generator.Excel_API
 {
@@ -33,7 +34,7 @@ namespace Excel_Generator.Excel_API
         {
             public string msg;
             public Exception exception;
-            
+
             public ErrorRes()
             {
                 msg = "";
@@ -65,7 +66,7 @@ namespace Excel_Generator.Excel_API
                 Console.ForegroundColor = ConsoleColor.White;
                 return new ErrorRes("Generating Failed", e);
             }
-            
+
             return null;
         }
 
@@ -74,6 +75,13 @@ namespace Excel_Generator.Excel_API
             Dictionary<int, string> studentData = new Dictionary<int, string>();
 
             Console.WriteLine("IDs:");
+
+
+            if (!Directory.Exists(foldername))
+            {
+                Console.WriteLine(" - Folder doesn't exist!");
+                return studentData;
+            }
 
             foreach (string file in Directory.GetFiles(foldername))
             {
@@ -111,6 +119,12 @@ namespace Excel_Generator.Excel_API
             List<int> studentIds = new List<int>();
 
             Console.WriteLine("IDs:");
+
+            if (!Directory.Exists(foldername))
+            {
+                Console.WriteLine(" - Folder doesn't exist!");
+                return studentIds;
+            }
 
             foreach (string file in Directory.GetFiles(foldername))
             {
@@ -325,10 +339,10 @@ namespace Excel_Generator.Excel_API
             ConfigThing config = ParseConfig(OGcfgSheet);
 
             int amountOfStudents = students.Length;
-            
+
             XSSFWorkbook[] workbooks = new XSSFWorkbook[amountOfStudents];
             SolutionClass[] sols = new SolutionClass[amountOfStudents];
-            
+
 
             XSSFFormulaEvaluator[] eval = new XSSFFormulaEvaluator[amountOfStudents];
             ISheet[] sol = new ISheet[amountOfStudents];
@@ -406,7 +420,7 @@ namespace Excel_Generator.Excel_API
                         //Cstyle.IsLocked = true;
 
                         //cell.CellStyle = Cstyle;
-                        
+
                         try
                         {
                             cell.CellStyle.IsLocked = true;
@@ -748,11 +762,17 @@ namespace Excel_Generator.Excel_API
         }
 
 
-        public static void GradeWorksheets(string[] worksheetFilenames, string solutionFolderPath, string gradedFolderPath)
+        public static void GradeWorksheets((StudentObject student, string path)[] studentFileArray, string solutionFolderPath, string gradedFolderPath)
         {
             {
                 if (!Directory.Exists(gradedFolderPath))
                     Directory.CreateDirectory(gradedFolderPath);
+
+                if (!Directory.Exists(gradedFolderPath + "/EXCEL"))
+                    Directory.CreateDirectory(gradedFolderPath + "/EXCEL");
+
+                if (!Directory.Exists(gradedFolderPath + "/TXT"))
+                    Directory.CreateDirectory(gradedFolderPath + "/TXT");
 
                 //string[] files_ = Directory.GetFiles(gradedFolderPath);
                 //foreach (string file in files_)
@@ -767,27 +787,27 @@ namespace Excel_Generator.Excel_API
             Console.WriteLine("----------------------------------------------------------");
             Console.WriteLine();
 
-            foreach (string file in worksheetFilenames)
+            foreach (var file in studentFileArray)
             {
                 Console.WriteLine($"> Schaue Datei \"{file}\" an:");
 
                 try
                 {
-                    IWorkbook book = WorkbookFactory.Create(file);
+                    IWorkbook book = WorkbookFactory.Create(file.path);
 
                     ISheet main = book.GetSheetAt(0);
 
                     int id = (int)(GetCellFromXY(main, 0, 999).NumericCellValue - 100);
                     //Console.WriteLine($"ID: {id}");
 
-                    GradeWorkSheet(book, $"{solutionFolderPath}/TXT/Loesung {id}.txt", file, true, id, $"{gradedFolderPath}/{Path.GetFileName(file)}", cfg);
+                    GradeWorkSheet(book, $"{solutionFolderPath}/TXT/Loesung {id}.txt", file.path, true, id, $"{gradedFolderPath}/EXCEL/{Path.GetFileName(file.path)}", $"{gradedFolderPath}/TXT/Statistik {file.student.id}.txt", cfg);
 
                     book.Close();
                 }
                 catch (Exception e)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"Bei der Datei \"{file}\" ist ein Fehler aufgetreten! ({e})");
+                    Console.WriteLine($"Bei der Datei \"{file.path}\" ist ein Fehler aufgetreten! ({e})");
                     Console.ForegroundColor = ConsoleColor.White;
                 }
             }
@@ -797,35 +817,37 @@ namespace Excel_Generator.Excel_API
             Console.WriteLine("----------------------------------------------------------");
             Console.WriteLine();
 
-            foreach (string file in worksheetFilenames)
+            foreach (var file in studentFileArray)
             {
                 try
                 {
-                    IWorkbook book = WorkbookFactory.Create(file);
+                    IWorkbook book = WorkbookFactory.Create(file.path);
 
                     ISheet main = book.GetSheetAt(0);
 
                     int id = (int)(GetCellFromXY(main, 0, 999).NumericCellValue - 100);
                     //Console.WriteLine($"ID: {id}");
 
-                    GradeWorkSheet(book, $"{solutionFolderPath}/TXT/Loesung {id}.txt", file, false, id, "", cfg);
+                    GradeWorkSheet(book, $"{solutionFolderPath}/TXT/Loesung {id}.txt", file.path, false, id, "", "", cfg);
 
                     book.Close();
                 }
                 catch (Exception e)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"Bei der Datei \"{file}\" ist ein Fehler aufgetreten! ({e})");
+                    Console.WriteLine($"Bei der Datei \"{file.path}\" ist ein Fehler aufgetreten! ({e})");
                     Console.ForegroundColor = ConsoleColor.White;
                 }
             }
         }
 
-        static void GradeWorkSheet(IWorkbook book, string solutionPath, string filename, bool show_deb, int id, string gradedFilePath, GradingConfig cfg)
+        static void GradeWorkSheet(IWorkbook book, string solutionPath, string filename, bool show_deb, int id, string gradedExcelFilePath, string gradedTextFilePath, GradingConfig cfg)
         {
             ISheet main = book.GetSheetAt(0);
             XSSFFormulaEvaluator eval = new XSSFFormulaEvaluator(book);
             SolutionClass sol = new SolutionClass(solutionPath);
+
+            List<double> pointsGained = new List<double>();
 
             double score = 0, maxScore = 0;
 
@@ -861,6 +883,7 @@ namespace Excel_Generator.Excel_API
                     if (show_deb)
                     {
                         Console.Write($"Passt. {thing.points}/{thing.points}");
+                        pointsGained.Add(thing.points);
 
                         if (cell != null)
                         {
@@ -877,6 +900,7 @@ namespace Excel_Generator.Excel_API
                     if (show_deb)
                     {
                         Console.Write($"Passt nicht. 0/{thing.points}");
+                        pointsGained.Add(0);
 
                         if (cell != null)
                         {
@@ -916,10 +940,20 @@ namespace Excel_Generator.Excel_API
                     }
                 }
 
+                using (StreamWriter writer = new StreamWriter(gradedTextFilePath))
+                {
+                    writer.WriteLine("Punkte:");
+                    writer.WriteLine(score.ToString(CultureInfo.InvariantCulture));
+                    writer.WriteLine("Von:");
+                    writer.WriteLine(maxScore.ToString(CultureInfo.InvariantCulture));
+                    writer.WriteLine("Aufgaben:");
+                    writer.WriteLine(pointsGained.Count.ToString(CultureInfo.InvariantCulture));
+                    writer.WriteLine("Liste:");
+                    foreach (var x in pointsGained)
+                        writer.WriteLine(x.ToString(CultureInfo.InvariantCulture));
+                }
 
-
-
-                book.Write(new FileStream(gradedFilePath, FileMode.Create));
+                book.Write(new FileStream(gradedExcelFilePath, FileMode.Create));
             }
 
 
