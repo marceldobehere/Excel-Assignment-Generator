@@ -83,10 +83,14 @@ namespace Excel_Generator.Utils
                 Warning_StudentDuplicateText,
                 Warning_StudentDoneAssignmentText,
                 Warning_StudentReviewedAssignmentText,
+                Warning_StudentAssignmentNotAssignedText,
                 Warning_YesButton,
                 Warning_NoButton,
                 Settings_TitleText,
                 Settings_LanguageSelectionText,
+                Settings_ConsoleSelectionText,
+                Settings_ConsoleSelectionShownText,
+                Settings_ConsoleSelectionHiddenText,
                 Class_TitleText,
                 Class_StudentText,
                 Class_StudentNameText,
@@ -104,7 +108,15 @@ namespace Excel_Generator.Utils
                 Assignment_DeleteAssignmentText,
                 Assignment_GradeAssignmentText,
                 Assignment_ViewAssignmentText,
-                Assignment_UploadAssignmentText
+                Assignment_UploadAssignmentText,
+                Assignment_ViewStatisticsText,
+                Statistics_NameText,
+                Statistics_NoStudentsText,
+                Statistics_StudentText,
+                Statistics_PointsText,
+                Statistics_TotalPointsText,
+                Statistics_PercentText,
+                Statistics_GradeText
             };
 
             private Dictionary<Phrase, SettingsObject> phrases;

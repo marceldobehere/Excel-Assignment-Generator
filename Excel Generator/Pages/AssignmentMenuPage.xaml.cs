@@ -159,6 +159,7 @@ namespace Excel_Generator.Pages
             checkAssignmentButton.Content = LocalizationManager.GetPhrase(Phrase.Assignment_GradeAssignmentText);
             viewAssignmentButton.Content = LocalizationManager.GetPhrase(Phrase.Assignment_ViewAssignmentText);
             uploadAssignmentButton.Content = LocalizationManager.GetPhrase(Phrase.Assignment_UploadAssignmentText);
+            viewStatsButton.Content = LocalizationManager.GetPhrase(Phrase.Assignment_ViewStatisticsText);
         }
 
         private void flipSelectionButton_Click(object sender, RoutedEventArgs e)
@@ -237,9 +238,7 @@ namespace Excel_Generator.Pages
         }
 
         // TODO:
-        // Add Assignment Statistics
-        // Add Student Statistics
-        // Add Class Statistics
+        // Add Class Statistics ?
 
         // Add Manual Grading
         // Improve Vorlage
@@ -376,7 +375,7 @@ namespace Excel_Generator.Pages
 
 
                 if (selectedStudents.Count == 0)
-                    return;
+                    goto end;
 
 
                 Console.WriteLine("\nLösungen");
@@ -393,11 +392,11 @@ namespace Excel_Generator.Pages
                     Console.WriteLine($" - Deleting data from: {student.name}");
                     if (uploadedIds.ContainsKey(student.id))
                         File.Delete(uploadedIds[student.id]);
-                    
+
                     if (reviewedIds.ContainsKey(student.id))
                     {
-                        string name = System.IO.Path.GetFileNameWithoutExtension(solutionIds[student.id]);
-                        string tempPath = Directory.GetParent(System.IO.Path.GetDirectoryName(solutionIds[student.id])).FullName;
+                        string name = System.IO.Path.GetFileNameWithoutExtension(reviewedIds[student.id]);
+                        string tempPath = Directory.GetParent(System.IO.Path.GetDirectoryName(reviewedIds[student.id])).FullName;
 
                         Console.WriteLine($" - Name: {name}");
                         Console.WriteLine($" - Path: {tempPath}");
@@ -405,7 +404,7 @@ namespace Excel_Generator.Pages
 
                         //File.Delete(tempPath + "/EXCEL/" + name + ".xlsx");
                         File.Delete(reviewedIds[student.id]);
-                        File.Delete(tempPath + "/TXT/" + name + ".txt");
+                        File.Delete(tempPath + "/TXT/" + $"Statistik {student.id}.txt");
                     }
 
                     if (solutionIds.ContainsKey(student.id))
@@ -424,6 +423,7 @@ namespace Excel_Generator.Pages
                 }
 
             }
+        end:
 
             CreateCheckBoxList();
         }
@@ -470,13 +470,13 @@ namespace Excel_Generator.Pages
 
 
                 if (selectedStudents.Count == 0)
-                    return;
+                    goto end;
 
 
                 Console.WriteLine("\nAbgegeben");
                 Dictionary<int, string> uploadedIds = Excel_API.MainExcelAPI.GetStudentIDsAndFilenamesFromFolder(assignmentFolderPath + "Abgegebene Aufgaben");
 
-               
+
                 List<(StudentObject student, string path)> toGrade = new List<(StudentObject student, string path)>();
 
                 foreach (var student in selectedStudents)
@@ -487,10 +487,11 @@ namespace Excel_Generator.Pages
                     }
 
                 if (selectedStudents.Count == 0)
-                    return;
+                    goto end;
                 Excel_API.MainExcelAPI.GradeWorksheets(toGrade.ToArray(), assignmentFolderPath + "Loesungen", assignmentFolderPath + "Fertige Aufgaben");
             }
 
+        end:
             CreateCheckBoxList();
         }
 
@@ -523,29 +524,151 @@ namespace Excel_Generator.Pages
 
         private void uploadAssignmentButton_Click(object sender, RoutedEventArgs e)
         {
+            string assignmentFolderPath = Settings.SETTINGS_PATH + "Jahre/" +
+                                          Settings.selectedYear + "/Klassen/" +
+                                          Settings.selectedClass + "/Aufgaben/" +
+                                          Settings.selectedAssignment + "/";
+
             OpenFileDialog test = new OpenFileDialog();
             test.Multiselect = true;
             test.Filter = "Excel Files|*.xls;*.xlsx;*.xlsm";
 
-            var res = test.ShowDialog();
-            if (!res.HasValue)
-                return;
-            if (!res.Value)
-                return;
+            {
+                var res = test.ShowDialog();
+                if (!res.HasValue)
+                    goto end;
+                if (!res.Value)
+                    goto end;
+            }
+
+            Console.WriteLine("\nLösungen");
+            var solutionIds = Excel_API.MainExcelAPI.GetStudentIDsFromFolder(assignmentFolderPath + "Loesungen/EXCEL");
 
             Console.WriteLine("Files:");
             foreach (string filename in test.FileNames)
             {
                 Console.WriteLine($" - {filename}");
+
+                int id = Excel_API.MainExcelAPI.GetStudentIDFromFile(filename);
+
+                if (id == -1)
+                    continue;
+
+                if (!solutionIds.Contains(id))
+                {
+                    StudentObject testStudentObject = null;
+                    string selectedStudentName = "<NONE>";
+                    foreach (var studentName in Settings.StudentList)
+                    {
+                        if (studentName.Equals(LocalizationManager.GetPhrase(Phrase.Class_SelectStudentTextNew)))
+                            continue;
+                        StudentObject studentObj = ConvertStringToStudentStruct(studentName);
+                        if (studentObj != null)
+                        {
+                            if (studentObj.id != id)
+                                continue;
+                            selectedStudentName = studentObj.name;
+                            testStudentObject = studentObj;
+                        }
+                    }
+
+                    var res = StudentWarning.ShowWarningBox(
+                        LocalizationManager.GetPhrase(Phrase.Warning_TitleText),
+                        LocalizationManager.GetPhrase(Phrase.Warning_StudentStartText),
+                        selectedStudentName,
+                        LocalizationManager.GetPhrase(Phrase.Warning_StudentAssignmentNotAssignedText),
+                        LocalizationManager.GetPhrase(Phrase.Warning_YesButton),
+                        LocalizationManager.GetPhrase(Phrase.Warning_NoButton)
+                        );
+
+                    if (res == StudentWarning.InputState.YES)
+                    {
+                        string solFile = assignmentFolderPath + "Vorlage.xlsx";
+                        string solFolder = assignmentFolderPath + "Loesungen";
+                        string queFolder = assignmentFolderPath + "Aufgaben";
+
+
+                        Excel_API.MainExcelAPI.ErrorRes error = Excel_API.MainExcelAPI.GenerateAssignmentsForStudents(new StudentObject[1] {testStudentObject}, solFile, solFolder, queFolder);
+                        if (error != null)
+                            MessageBox.Show($"Error: {error.exception}", "Error");
+
+                        CreateCheckBoxList();
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+
                 string newFilename = Settings.SETTINGS_PATH + "Jahre/" +
                                      Settings.selectedYear + "/Klassen/" +
                                      Settings.selectedClass + "/Aufgaben/" +
-                                     Settings.selectedAssignment + "/Abgegebene Aufgaben/EXCEL/" +
+                                     Settings.selectedAssignment + "/Abgegebene Aufgaben/" +
                                      System.IO.Path.GetFileName(filename);
                 File.Copy(filename, newFilename, true);
             }
 
+        end:
             CreateCheckBoxList();
+        }
+
+        private void viewStatsButton_Click(object sender, RoutedEventArgs e)
+        {
+            string assignmentFolderPath = Settings.SETTINGS_PATH + "Jahre/" +
+                                          Settings.selectedYear + "/Klassen/" +
+                                          Settings.selectedClass + "/Aufgaben/" +
+                                          Settings.selectedAssignment + "/";
+
+            List<StudentObject> selectedStudents = GetSelectedStudents();
+
+            List<StudentObject> studentsToAddToStat = new List<StudentObject>();
+            List<StudentObject> studentsToAddToStatNotUploaded = new List<StudentObject>();
+
+            {
+                Console.WriteLine("\nLösungen");
+                Dictionary<int, string> solutionIds = Excel_API.MainExcelAPI.GetStudentIDsAndFilenamesFromFolder(assignmentFolderPath + "Loesungen/EXCEL");
+
+                for (int i = 0; i < selectedStudents.Count; i++)
+                {
+                    var student = selectedStudents[i];
+
+                    if (solutionIds.ContainsKey(student.id))
+                        studentsToAddToStat.Add(student);
+                }
+
+                Console.WriteLine("\nAbgegeben");
+                Dictionary<int, string> uploadedIds = Excel_API.MainExcelAPI.GetStudentIDsAndFilenamesFromFolder(assignmentFolderPath + "Abgegebene Aufgaben");
+
+                foreach (var student in studentsToAddToStat)
+                {
+                    if (!uploadedIds.ContainsKey(student.id))
+                        studentsToAddToStatNotUploaded.Add(student);
+                }
+
+
+
+
+                if (studentsToAddToStat.Count == 0)
+                {
+                    MessageBox.Show(LocalizationManager.GetPhrase(Phrase.Statistics_NoStudentsText), LocalizationManager.GetPhrase(Phrase.Warning_TitleText));
+                    return;
+                }
+
+                Console.WriteLine("Students:");
+                foreach (var student in studentsToAddToStat)
+                    Console.WriteLine($" - Student: {student.name}");
+
+                Excel_API.MainExcelStatsAPI.CreateAssignmentStatistics(
+                    studentsToAddToStat.ToArray(),
+                    studentsToAddToStatNotUploaded.ToArray(),
+                    assignmentFolderPath + "Fertige Aufgaben/TXT", 
+                    assignmentFolderPath + "Fertige Aufgaben/Statistiken.xlsx",
+                    LocalizationManager.GetPhrase(Phrase.Statistics_NameText),
+                    Settings.selectedYear,
+                    Settings.selectedClass,
+                    Settings.selectedAssignment
+                    );
+            }
         }
     }
 }

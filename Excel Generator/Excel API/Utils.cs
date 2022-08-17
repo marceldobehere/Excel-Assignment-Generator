@@ -370,6 +370,34 @@ namespace Excel_Generator.Excel_API.Utils
             }
         }
 
+        public static int GetGrade(int percent)
+        {
+            int grade;
+            {
+                /* 
+                1: 100-91
+                2: 90-81
+                3: 80-66
+                4: 65-50
+                5: < 50
+                */
+
+                if (percent >= 91)
+                    grade = 4;
+                else if (percent >= 81)
+                    grade = 3;
+                else if (percent >= 66)
+                    grade = 2;
+                else if (percent >= 50)
+                    grade = 1;
+                else
+                    grade = 0;
+
+                return 5 - grade;
+            }
+            return 5;
+        }
+
         public class ColDict<T1, T2>
         {
             public List<T1> values;

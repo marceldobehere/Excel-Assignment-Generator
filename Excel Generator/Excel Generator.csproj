@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Pages\back.png" />
     <None Remove="Pages\openInFolder.png" />
     <None Remove="Pages\uploadFromFile.png" />
   </ItemGroup>
@@ -19,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Pages\back.png" />
     <Resource Include="Pages\openInFolder.png" />
     <Resource Include="Pages\uploadFromFile.png" />
   </ItemGroup>

@@ -11,6 +11,11 @@
         <ComboBox x:Name="langBox" HorizontalAlignment="Left" Margin="140,94,0,0" VerticalAlignment="Top" Width="170" SelectionChanged="ComboBox_SelectionChanged" Height="38" FontSize="24"/>
         <TextBlock x:Name="settingsTitleLabel" HorizontalAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" Text="Settings" VerticalAlignment="Top" Height="75" Width="284" FontWeight="Bold" FontSize="40" TextAlignment="Center"/>
         <TextBlock HorizontalAlignment="Left" Margin="10,424,0,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Language="de-de" Text="© Marcel Zietek 2022"/></TextBlock>
+        <Button x:Name="closeSettingsMenuButton" HorizontalAlignment="Left" Margin="16,16,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.939,-0.18" Height="40" Width="40" Foreground="#FF952626" FontSize="30" FontWeight="Bold" Click="closeSettingsMenuButton_Click">
+            <Image Source="/Pages/back.png"/>
+        </Button>
+        <TextBlock x:Name="settingsConsoleSelectionLabel" HorizontalAlignment="Left" Margin="10,137,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="40" Width="130" FontSize="24"><Run Language="de-de" Text="C"/><Run Text="onsole"/></TextBlock>
+        <ComboBox x:Name="consoleBox" HorizontalAlignment="Left" Margin="140,138,0,0" VerticalAlignment="Top" Width="170" Height="38" FontSize="24" SelectionChanged="consoleBox_SelectionChanged"/>
 
     </Grid>
 </UserControl>

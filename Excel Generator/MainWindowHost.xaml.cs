@@ -30,6 +30,9 @@ namespace Excel_Generator
             globalHost = this;
             Utils.Utils.AllocConsole();
             //Utils.Utils.HideConsole();
+
+            Pages.SettingsPage.ConsoleState = false;
+
             Settings.Init(Utils.Settings.SETTINGS_PATH);
             LocalizationManager.Init();
             InitializeComponent();

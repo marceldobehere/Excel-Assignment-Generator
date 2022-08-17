@@ -27,6 +27,8 @@ namespace Excel_Generator.Pages
             InitializeComponent();
             langBox.ItemsSource = Utils.Settings.LanguageList;
             langBox.SelectedItem = Utils.Settings.Language;
+
+            UpdateText();
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -40,12 +42,58 @@ namespace Excel_Generator.Pages
                 LocalizationManager.UpdateLang(e.AddedItems[0] as string);
             }
         }
-    
-    
+
+        private static List<string> consoleOptions = new List<string>();
+        private static bool consoleState = false;
+        public static bool ConsoleState
+        {
+            get
+            {
+                return consoleState;
+            }
+            set
+            {
+                consoleState = value;
+                if (consoleState)
+                {
+                    Utils.Utils.ShowConsole();
+                }
+                else
+                {
+                    Utils.Utils.HideConsole();
+                }
+            }
+        }
+
         public void UpdateText()
         {
             settingsTitleLabel.Text = LocalizationManager.GetPhrase(Phrase.Settings_TitleText);
             settingsLangSelectionLabel.Text = LocalizationManager.GetPhrase(Phrase.Settings_LanguageSelectionText);
+            settingsConsoleSelectionLabel.Text = LocalizationManager.GetPhrase(Phrase.Settings_ConsoleSelectionText);
+
+            consoleOptions = new List<string>();
+            consoleOptions.Add(LocalizationManager.GetPhrase(Phrase.Settings_ConsoleSelectionHiddenText));
+            consoleOptions.Add(LocalizationManager.GetPhrase(Phrase.Settings_ConsoleSelectionShownText));
+
+            consoleBox.ItemsSource = consoleOptions;
+            
+            if (consoleState)
+                consoleBox.SelectedItem = LocalizationManager.GetPhrase(Phrase.Settings_ConsoleSelectionShownText);
+            else
+                consoleBox.SelectedItem = LocalizationManager.GetPhrase(Phrase.Settings_ConsoleSelectionHiddenText);
+        }
+
+        private void closeSettingsMenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Visibility = Visibility.Hidden;
+        }
+
+        private void consoleBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count == 0)
+                return;
+
+            ConsoleState = (e.AddedItems[0] == LocalizationManager.GetPhrase(Phrase.Settings_ConsoleSelectionShownText));
         }
     }
 }

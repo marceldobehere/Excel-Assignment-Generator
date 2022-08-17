@@ -13,6 +13,7 @@ using NPOI.SS.Util;
 using System.Globalization;
 using static Excel_Generator.Excel_API.Utils.Utils.SolutionClass;
 using static Excel_Generator.Utils.Utils;
+using System.Windows;
 
 namespace Excel_Generator.Excel_API
 {
@@ -158,134 +159,42 @@ namespace Excel_Generator.Excel_API
         }
 
 
-        public static void FakeMain(string[] args)
+        public static int GetStudentIDFromFile(string file)
         {
-            Clear();
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("Was wollen Sie tun?");
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine("1: Angaben erstellen");
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("2: Abgegebene Angaben automatisch beurteilen");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine();
+            Console.WriteLine("IDs:");
 
-            string input = "";
-            while (!input.Equals("1") && !input.Equals("2"))
+            if (!File.Exists(file))
             {
-                Console.Write("> ");
-                input = Console.ReadLine();
+                Console.WriteLine(" - Folder doesn't exist!");
+                return -1;
             }
 
-            //if (input.Equals("1"))
-            //{
-            //    string solutionFilePath = "Vorlage.xlsx", solutionFolderPath = "Loesungen", questionFolderPath = "Aufgaben";
+            if (!file.EndsWith(".xlsx"))
+                return -1;
 
-            //    Console.WriteLine("Bitte geben Sie den Pfad zur Angabedatei an.");
-            //    while (!File.Exists(solutionFilePath))
-            //    {
-            //        Console.Write("> ");
-            //        solutionFilePath = Console.ReadLine();
-            //    }
-            //    Console.WriteLine($"Angabedatei: \"{solutionFilePath}\"");
-            //    Console.WriteLine();
+            try
+            {
+                IWorkbook book = WorkbookFactory.Create(file);
 
+                ISheet main = book.GetSheetAt(0);
 
-            //    Console.WriteLine("Bitte geben Sie den Pfad zum Loesungsordner an.");
-            //    while (!Directory.Exists(solutionFolderPath))
-            //    {
-            //        Console.Write("> ");
-            //        solutionFolderPath = Console.ReadLine();
-            //    }
-            //    Console.WriteLine($"Loesungsordner: \"{solutionFolderPath}\"");
-            //    Console.WriteLine();
+                int id = (int)(GetCellFromXY(main, 0, 999).NumericCellValue - 100);
 
+                Console.WriteLine($" - {id}");
 
-            //    Console.WriteLine("Bitte geben Sie den Pfad zum Angabenordner an.");
-            //    while (!Directory.Exists(questionFolderPath))
-            //    {
-            //        Console.Write("> ");
-            //        questionFolderPath = Console.ReadLine();
-            //    }
-            //    Console.WriteLine($"Angabenordner: \"{questionFolderPath}\"");
-            //    Console.WriteLine();
+                book.Close();
 
-            //    Console.WriteLine("Geben Sie die Anzahl an Angaben an.");
-            //    string amount = "";
-            //    while (!int.TryParse(amount, out _))
-            //    {
-            //        Console.Write("> ");
-            //        amount = Console.ReadLine();
-            //    }
-            //    Console.WriteLine();
+                return id;
+            }
+            catch (Exception e)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Bei der Datei \"{file}\" ist ein Fehler aufgetreten! ({e})");
+                Console.ForegroundColor = ConsoleColor.White;
+            }
 
-            //    Console.WriteLine("Geben Sie das Passwort ein: (Leer lassen um es ohne Passwort zu schützen)");
-            //    Console.Write("> ");
-            //    string password = Console.ReadLine();
-            //    Console.WriteLine();
-
-            //    try
-            //    {
-            //        GenerateQuestionsAndSolutions(int.Parse(amount), solutionFilePath, solutionFolderPath, questionFolderPath, password);
-            //    }
-            //    catch (Exception e)
-            //    {
-            //        Console.ForegroundColor = ConsoleColor.Red;
-            //        Console.WriteLine($"Beim Generieren der Fragen ist ein Fehler aufgetreten: {e.Message}");
-            //        Console.ForegroundColor = ConsoleColor.White;
-            //    }
-            //}
-            //else if (input.Equals("2"))
-            //{
-            //    string solutionFolderPath = "Loesungen", questionFolderPath = "Abgegebene Aufgaben", gradedFolderPath = "Verbesserte Aufgaben";
-
-            //    Console.WriteLine("Bitte geben Sie den Pfad zu den Angaben an.");
-            //    while (!Directory.Exists(questionFolderPath))
-            //    {
-            //        Console.Write("> ");
-            //        questionFolderPath = Console.ReadLine();
-            //    }
-            //    Console.WriteLine($"Angabeordner: \"{questionFolderPath}\"");
-            //    Console.WriteLine();
-
-            //    Console.WriteLine("Bitte geben Sie den Pfad zum Loesungsordner an.");
-            //    while (!Directory.Exists(solutionFolderPath))
-            //    {
-            //        Console.Write("> ");
-            //        solutionFolderPath = Console.ReadLine();
-            //    }
-            //    Console.WriteLine($"Loesungsordner: \"{solutionFolderPath}\"");
-            //    Console.WriteLine();
-
-
-            //    Console.WriteLine("Bitte geben Sie den Pfad vom Ordner an, indem die Aufgaben verbessert werden sollen.");
-            //    while (!Directory.Exists(gradedFolderPath))
-            //    {
-            //        Console.Write("> ");
-            //        gradedFolderPath = Console.ReadLine();
-            //    }
-            //    Console.WriteLine($"Verbesserte Angaben-Order: \"{gradedFolderPath}\"");
-            //    Console.WriteLine();
-            //    try
-            //    {
-            //        GradeWorksheets(questionFolderPath, solutionFolderPath, gradedFolderPath);
-            //    }
-            //    catch (Exception e)
-            //    {
-            //        Console.ForegroundColor = ConsoleColor.Red;
-            //        Console.WriteLine($"Beim Bewerten der Abgegebenen Angaben ist ein Fehler aufgetreten: {e.Message}");
-            //        Console.ForegroundColor = ConsoleColor.White;
-            //    }
-            //}
-
-
-
-
-            Console.WriteLine("\nEnde.");
-            Console.ReadLine();
+            return -1;
         }
-
-
 
         static void GenerateQuestionsAndSolutions(Excel_Generator.Utils.Utils.StudentObject[] students, string solutionFilePath, string solutionFolderPath, string questionFolderPath, string password = "")
         {
@@ -808,6 +717,7 @@ namespace Excel_Generator.Excel_API
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine($"Bei der Datei \"{file.path}\" ist ein Fehler aufgetreten! ({e})");
+                    MessageBox.Show($"Error: {e.Message}");
                     Console.ForegroundColor = ConsoleColor.White;
                 }
             }
@@ -836,6 +746,7 @@ namespace Excel_Generator.Excel_API
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine($"Bei der Datei \"{file.path}\" ist ein Fehler aufgetreten! ({e})");
+                    MessageBox.Show($"Error: {e.Message}");
                     Console.ForegroundColor = ConsoleColor.White;
                 }
             }
