@@ -84,6 +84,7 @@ namespace Excel_Generator.Utils
                 Warning_StudentDoneAssignmentText,
                 Warning_StudentReviewedAssignmentText,
                 Warning_StudentAssignmentNotAssignedText,
+                Warning_StudentDoneAssignmentUploadText,
                 Warning_YesButton,
                 Warning_NoButton,
                 Settings_TitleText,

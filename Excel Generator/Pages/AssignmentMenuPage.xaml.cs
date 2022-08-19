@@ -544,6 +544,9 @@ namespace Excel_Generator.Pages
             Console.WriteLine("\nLösungen");
             var solutionIds = Excel_API.MainExcelAPI.GetStudentIDsFromFolder(assignmentFolderPath + "Loesungen/EXCEL");
 
+            Console.WriteLine("\nAbgegeben");
+            var uploadedIds = Excel_API.MainExcelAPI.GetStudentIDsFromFolder(assignmentFolderPath + "Abgegebene Aufgaben");
+
             Console.WriteLine("Files:");
             foreach (string filename in test.FileNames)
             {
@@ -572,33 +575,69 @@ namespace Excel_Generator.Pages
                         }
                     }
 
+                    //var res = StudentWarning.ShowWarningBox(
+                    //    LocalizationManager.GetPhrase(Phrase.Warning_TitleText),
+                    //    LocalizationManager.GetPhrase(Phrase.Warning_StudentStartText),
+                    //    selectedStudentName,
+                    //    LocalizationManager.GetPhrase(Phrase.Warning_StudentAssignmentNotAssignedText),
+                    //    LocalizationManager.GetPhrase(Phrase.Warning_YesButton),
+                    //    LocalizationManager.GetPhrase(Phrase.Warning_NoButton)
+                    //    );
+
+                    MessageBox.Show($"{LocalizationManager.GetPhrase(Phrase.Warning_StudentStartText)} {selectedStudentName} {LocalizationManager.GetPhrase(Phrase.Warning_StudentAssignmentNotAssignedText)}", LocalizationManager.GetPhrase(Phrase.Warning_TitleText));
+
+                    continue;
+
+                    //if (res == StudentWarning.InputState.YES)
+                    //{
+                    //    string solFile = assignmentFolderPath + "Vorlage.xlsx";
+                    //    string solFolder = assignmentFolderPath + "Loesungen";
+                    //    string queFolder = assignmentFolderPath + "Aufgaben";
+
+
+                    //    Excel_API.MainExcelAPI.ErrorRes error = Excel_API.MainExcelAPI.GenerateAssignmentsForStudents(new StudentObject[1] {testStudentObject}, solFile, solFolder, queFolder);
+                    //    if (error != null)
+                    //        MessageBox.Show($"Error: {error.exception}", "Error");
+
+                    //    CreateCheckBoxList();
+                    //}
+                    //else
+                    //{
+                    //    continue;
+                    //}
+                }
+
+                if (uploadedIds.Contains(id))
+                {
+                    StudentObject testStudentObject = null;
+                    string selectedStudentName = "<NONE>";
+                    foreach (var studentName in Settings.StudentList)
+                    {
+                        if (studentName.Equals(LocalizationManager.GetPhrase(Phrase.Class_SelectStudentTextNew)))
+                            continue;
+                        StudentObject studentObj = ConvertStringToStudentStruct(studentName);
+                        if (studentObj != null)
+                        {
+                            if (studentObj.id != id)
+                                continue;
+                            selectedStudentName = studentObj.name;
+                            testStudentObject = studentObj;
+                        }
+                    }
+
                     var res = StudentWarning.ShowWarningBox(
                         LocalizationManager.GetPhrase(Phrase.Warning_TitleText),
                         LocalizationManager.GetPhrase(Phrase.Warning_StudentStartText),
                         selectedStudentName,
-                        LocalizationManager.GetPhrase(Phrase.Warning_StudentAssignmentNotAssignedText),
+                        LocalizationManager.GetPhrase(Phrase.Warning_StudentDoneAssignmentUploadText),
                         LocalizationManager.GetPhrase(Phrase.Warning_YesButton),
                         LocalizationManager.GetPhrase(Phrase.Warning_NoButton)
                         );
 
-                    if (res == StudentWarning.InputState.YES)
-                    {
-                        string solFile = assignmentFolderPath + "Vorlage.xlsx";
-                        string solFolder = assignmentFolderPath + "Loesungen";
-                        string queFolder = assignmentFolderPath + "Aufgaben";
-
-
-                        Excel_API.MainExcelAPI.ErrorRes error = Excel_API.MainExcelAPI.GenerateAssignmentsForStudents(new StudentObject[1] {testStudentObject}, solFile, solFolder, queFolder);
-                        if (error != null)
-                            MessageBox.Show($"Error: {error.exception}", "Error");
-
-                        CreateCheckBoxList();
-                    }
-                    else
-                    {
+                    if (res == StudentWarning.InputState.NO)
                         continue;
-                    }
                 }
+
 
                 string newFilename = Settings.SETTINGS_PATH + "Jahre/" +
                                      Settings.selectedYear + "/Klassen/" +
@@ -661,7 +700,7 @@ namespace Excel_Generator.Pages
                 Excel_API.MainExcelStatsAPI.CreateAssignmentStatistics(
                     studentsToAddToStat.ToArray(),
                     studentsToAddToStatNotUploaded.ToArray(),
-                    assignmentFolderPath + "Fertige Aufgaben/TXT", 
+                    assignmentFolderPath + "Fertige Aufgaben/TXT",
                     assignmentFolderPath + "Fertige Aufgaben/Statistiken.xlsx",
                     LocalizationManager.GetPhrase(Phrase.Statistics_NameText),
                     Settings.selectedYear,
