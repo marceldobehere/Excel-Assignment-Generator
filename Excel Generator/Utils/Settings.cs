@@ -180,8 +180,8 @@ namespace Excel_Generator.Utils
                 {
                     Console.WriteLine("> Creating Settings File");
                     Directory.CreateDirectory(folderPath);
-                    Directory.CreateDirectory(folderPath + "Klassen");
-                    File.Create(folderPath + "settings.cfg");
+                    Directory.CreateDirectory(folderPath + "Jahre");
+                    File.Create(folderPath + "settings.cfg").Close();
                 }
                 else
                 {
@@ -232,7 +232,7 @@ namespace Excel_Generator.Utils
                 {
                     Directory.CreateDirectory(folderPath);
                     Directory.CreateDirectory(folderPath + "Klassen");
-                    File.Create(folderPath + "settings.cfg");
+                    File.Create(folderPath + "settings.cfg").Close();
                 }
                 using (StreamWriter writer = new StreamWriter(folderPath + "settings.cfg"))
                 {

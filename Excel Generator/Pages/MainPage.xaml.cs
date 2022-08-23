@@ -117,7 +117,7 @@ namespace Excel_Generator.Pages
                     if (Utils.Utils.CheckFolderName(info.inputText))
                     {
                         Directory.CreateDirectory(Utils.Settings.SETTINGS_PATH + "Jahre/" + Utils.Settings.selectedYear + "/Klassen/" + info.inputText + "/Aufgaben");
-                        File.Create(Utils.Settings.SETTINGS_PATH + "Jahre/" + Utils.Settings.selectedYear + "/Klassen/" + info.inputText + "/Klassenliste.txt");
+                        File.Create(Utils.Settings.SETTINGS_PATH + "Jahre/" + Utils.Settings.selectedYear + "/Klassen/" + info.inputText + "/Klassenliste.txt").Close();
                         selectClassBox.ItemsSource = Settings.ClassList;
                         Utils.Settings.selectedClass = info.inputText;
                         selectClassBox.SelectedValue = info.inputText;
@@ -140,7 +140,7 @@ namespace Excel_Generator.Pages
                 Utils.Settings.selectedClass = selected;
             }
             selectAssignmentBox.SelectedValue = "";
-            Utils.Settings.selectedAssignment = "";
+            Settings.selectedAssignment = "";
             Settings.selectedStudent = "";
             UpdateText();
             MainWindowHost.globalHost.classMenuPage.UpdateText();
@@ -217,6 +217,14 @@ namespace Excel_Generator.Pages
                 UpdateText();
                 MainWindowHost.globalHost.classMenuPage.UpdateText();
                 MainWindowHost.globalHost.assignmentMenuPage.UpdateText();
+
+                selectAssignmentBox.SelectedValue = "";
+                Settings.selectedAssignment = "";
+                Settings.selectedStudent = "";
+                Settings.selectedClass = "";
+                UpdateText();
+                MainWindowHost.globalHost.classMenuPage.UpdateText();
+                MainWindowHost.globalHost.assignmentMenuPage.UpdateText();
             }
         }
 
@@ -232,6 +240,14 @@ namespace Excel_Generator.Pages
                 UpdateText();
                 MainWindowHost.globalHost.classMenuPage.UpdateText();
                 MainWindowHost.globalHost.assignmentMenuPage.UpdateText();
+
+                selectAssignmentBox.SelectedValue = "";
+                Settings.selectedAssignment = "";
+                Settings.selectedStudent = "";
+                Settings.selectedClass = "";
+                UpdateText();
+                MainWindowHost.globalHost.classMenuPage.UpdateText();
+                MainWindowHost.globalHost.assignmentMenuPage.UpdateText();
             }
         }
 
@@ -244,6 +260,10 @@ namespace Excel_Generator.Pages
                 Directory.Delete(Utils.Settings.SETTINGS_PATH + "Jahre/" + Settings.selectedYear + "/Klassen/" + Settings.selectedClass + "/Aufgaben/" + Settings.selectedAssignment, true);
                 Settings.selectedAssignment = "";
                 selectAssignmentBox.SelectedValue = "";
+                UpdateText();
+                MainWindowHost.globalHost.classMenuPage.UpdateText();
+                MainWindowHost.globalHost.assignmentMenuPage.UpdateText();
+
                 UpdateText();
                 MainWindowHost.globalHost.classMenuPage.UpdateText();
                 MainWindowHost.globalHost.assignmentMenuPage.UpdateText();
