@@ -102,7 +102,7 @@ namespace Excel_Generator.Pages
             {
                 List<string> studentList = Settings.StudentList;
                 studentList.Remove(Settings.selectedStudent);
-                studentList.Remove(LocalizationManager.GetPhrase(LocalizationManager.LanguagePhraseList.Phrase.Class_SelectStudentTextNew));
+                studentList.Remove(LocalizationManager.GetPhrase(Phrase.Class_SelectStudentTextNew));
 
                 using (StreamWriter writer = new StreamWriter(new FileStream(Settings.SETTINGS_PATH + "Jahre/" + Settings.selectedYear + "/Klassen/" + Settings.selectedClass + "/Klassenliste.txt", FileMode.Create)))
                 {

@@ -7,12 +7,18 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <SignAssembly>False</SignAssembly>
+    <StartupObject>Excel_Generator.App</StartupObject>
+    <ApplicationIcon>Icons\appIcon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Pages\back.png" />
     <None Remove="Pages\openInFolder.png" />
     <None Remove="Pages\uploadFromFile.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Icons\appIcon.ico" />
   </ItemGroup>
 
   <ItemGroup>

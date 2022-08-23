@@ -98,7 +98,7 @@ namespace Excel_Generator.Utils
             public int id = -1;
             public StudentObject(string name, int id)
             {
-                this.name = name;
+                this.name = name.Trim();
                 this.id = id;
             }
         }
@@ -109,12 +109,12 @@ namespace Excel_Generator.Utils
             int id = -1;
             if (int.TryParse(split[0], out id))
             {
-                StudentObject student = new StudentObject(split[1], id);
+                StudentObject student = new StudentObject(split[1].Trim(), id);
                 return student;
             }
             else if (int.TryParse(split[1], out id))
             {
-                StudentObject student = new StudentObject(split[0], id);
+                StudentObject student = new StudentObject(split[0].Trim(), id);
                 return student;
             }
             else
